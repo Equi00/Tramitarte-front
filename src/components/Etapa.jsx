@@ -55,6 +55,7 @@ function Etapa({ tramite }) {
       .then((response) => {
         setEstaCargando(false);
         navigate(`/home/solicitante/${idUsuario}`, { replace: true });
+        window.location.replace('')
         return response;
       })
       .catch((error) => navigate("/network-error"));

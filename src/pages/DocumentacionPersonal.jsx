@@ -16,6 +16,7 @@ import ModalConfirmacion from "../components/ModalConfirmacion";
 import ModalIsLoading from "../components/ModalIsLoading";
 import tramiteService from "../services/TramiteService";
 import { useAuth0 } from "@auth0/auth0-react";
+import ModalError from "../components/ModalError";
 
 function DocumentacionPersonal() {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ function DocumentacionPersonal() {
   const { isOpen, onToggle } = useDisclosure();
   const [estaModalAbierto, setEstaModalAbierto] = useState(false);
   const [estaCargando, setEstaCargando] = useState(false);
+  const { isOpen: isOpenModal, onOpen: onOpenModal, onClose: onCloseModal } = useDisclosure();
   const [documentacionSolicitante, setDocumentacionSolicitante] = useState({
     dniFrente: { tipo: "", nombre: "", archivoBase64: "" },
     dniDorso: { tipo: "", nombre: "", archivoBase64: "" },
@@ -35,6 +37,7 @@ function DocumentacionPersonal() {
 
   const abrirModal = () => {
     setEstaModalAbierto(true);
+    
   };
 
   const cerrarModal = () => {
@@ -42,68 +45,84 @@ function DocumentacionPersonal() {
   };
 
   const completarDocumentacionSolicitante = async ({ id, archivo }) => {
-    if (id === "dni-frente") {
-      let archivoBase64 = await fileToBase64(archivo);
-      setDocumentacionSolicitante({
-        dniFrente: {
-          tipo: "dni-frente",
-          nombre: archivo.name,
-          archivoBase64: "",
-        },
-        dniDorso: {
-          tipo: documentacionSolicitante.dniDorso.tipo,
-          nombre: documentacionSolicitante.dniDorso.nombre,
-          archivoBase64: documentacionSolicitante.dniDorso.archivoBase64,
-        },
-        certificadoNacimiento: {
-          tipo: documentacionSolicitante.certificadoNacimiento.tipo,
-          nombre: documentacionSolicitante.certificadoNacimiento.nombre,
-          archivoBase64:
-            documentacionSolicitante.certificadoNacimiento.archivoBase64,
-        },
-      });
-    }
-    if (id === "dni-dorso") {
-      let archivoBase64 = await fileToBase64(archivo);
-      setDocumentacionSolicitante({
-        dniFrente: {
-          tipo: documentacionSolicitante.dniFrente.tipo,
-          nombre: documentacionSolicitante.dniFrente.nombre,
-          archivoBase64: documentacionSolicitante.dniFrente.archivoBase64,
-        },
-        dniDorso: {
-          tipo: "dni-dorso",
-          nombre: archivo.name,
-          archivoBase64: "",
-        },
-        certificadoNacimiento: {
-          tipo: documentacionSolicitante.certificadoNacimiento.tipo,
-          nombre: documentacionSolicitante.certificadoNacimiento.nombre,
-          archivoBase64:
-            documentacionSolicitante.certificadoNacimiento.archivoBase64,
-        },
-      });
-    }
-    if (id === "certificado-nacimiento") {
-      let archivoBase64 = await fileToBase64(archivo);
-      setDocumentacionSolicitante({
-        dniFrente: {
-          tipo: documentacionSolicitante.dniFrente.tipo,
-          nombre: documentacionSolicitante.dniFrente.nombre,
-          archivoBase64: documentacionSolicitante.dniFrente.archivoBase64,
-        },
-        dniDorso: {
-          tipo: documentacionSolicitante.dniDorso.tipo,
-          nombre: documentacionSolicitante.dniDorso.nombre,
-          archivoBase64: documentacionSolicitante.dniDorso.archivoBase64,
-        },
-        certificadoNacimiento: {
-          tipo: "certificado-nacimiento",
-          nombre: archivo.name,
-          archivoBase64: "",
-        },
-      });
-    }
+      if (id === "dni-frente") {
+        let verificacion = await tramiteService.esDniFrente(archivo)
+        if(verificacion === false){
+          onOpenModal()
+        }else{
+        let archivoBase64 = await fileToBase64(archivo);
+        setDocumentacionSolicitante({
+          dniFrente: {
+            tipo: "dni-frente",
+            nombre: archivo.name,
+            archivoBase64: "",
+          },
+          dniDorso: {
+            tipo: documentacionSolicitante.dniDorso.tipo,
+            nombre: documentacionSolicitante.dniDorso.nombre,
+            archivoBase64: documentacionSolicitante.dniDorso.archivoBase64,
+          },
+          certificadoNacimiento: {
+            tipo: documentacionSolicitante.certificadoNacimiento.tipo,
+            nombre: documentacionSolicitante.certificadoNacimiento.nombre,
+            archivoBase64:
+              documentacionSolicitante.certificadoNacimiento.archivoBase64,
+          },
+        });
+      }
+      }
+      if (id === "dni-dorso") {
+        let verificacion = await tramiteService.esDniDorso(archivo)
+        if(verificacion === false){
+          onOpenModal()
+        }else{
+        let archivoBase64 = await fileToBase64(archivo);
+        setDocumentacionSolicitante({
+          dniFrente: {
+            tipo: documentacionSolicitante.dniFrente.tipo,
+            nombre: documentacionSolicitante.dniFrente.nombre,
+            archivoBase64: documentacionSolicitante.dniFrente.archivoBase64,
+          },
+          dniDorso: {
+            tipo: "dni-dorso",
+            nombre: archivo.name,
+            archivoBase64: "",
+          },
+          certificadoNacimiento: {
+            tipo: documentacionSolicitante.certificadoNacimiento.tipo,
+            nombre: documentacionSolicitante.certificadoNacimiento.nombre,
+            archivoBase64:
+              documentacionSolicitante.certificadoNacimiento.archivoBase64,
+          },
+        });
+      }
+      }
+      if (id === "certificado-nacimiento") {
+        let verificacion = await tramiteService.esCertificado(archivo)
+        console.log(verificacion)
+        if(verificacion === false){
+          onOpenModal()
+        }else{
+        let archivoBase64 = await fileToBase64(archivo);
+        setDocumentacionSolicitante({
+          dniFrente: {
+            tipo: documentacionSolicitante.dniFrente.tipo,
+            nombre: documentacionSolicitante.dniFrente.nombre,
+            archivoBase64: documentacionSolicitante.dniFrente.archivoBase64,
+          },
+          dniDorso: {
+            tipo: documentacionSolicitante.dniDorso.tipo,
+            nombre: documentacionSolicitante.dniDorso.nombre,
+            archivoBase64: documentacionSolicitante.dniDorso.archivoBase64,
+          },
+          certificadoNacimiento: {
+            tipo: "certificado-nacimiento",
+            nombre: archivo.name,
+            archivoBase64: "",
+          },
+        });
+      }
+      }
   };
 
   const handleConfirmacion = async () => {
@@ -140,11 +159,13 @@ function DocumentacionPersonal() {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(archivo);
-
+  
       reader.onloadend = () => {
-        resolve(reader.result);
+        const base64File = reader.result.split(",")[1];
+  
+        resolve(base64File);
       };
-
+  
       reader.onerror = (error) => {
         reject(error);
       };
@@ -230,6 +251,14 @@ function DocumentacionPersonal() {
         isOpen={estaModalAbierto}
         handleConfirmacion={handleConfirmacion}
         onClose={cerrarModal}
+      />
+      <ModalError
+        pregunta={"El archivo seleccionado no es valido"}
+        datoAConfirmar={
+          "Por favor elija el archivo correspondiente para continuar"
+        }
+        isOpen={isOpenModal}
+        onClose={onCloseModal}
       />
       <ModalIsLoading
         mensaje={"Esperanos mientras guardamos la documentación ;)"}

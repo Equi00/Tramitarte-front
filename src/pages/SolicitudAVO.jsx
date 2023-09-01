@@ -29,6 +29,7 @@ import ModalConfirmacion from "../components/ModalConfirmacion";
 import ModalIsLoading from "../components/ModalIsLoading";
 import tramiteService from "../services/TramiteService";
 import { TramiteContext } from "../App";
+import ModalError from "../components/ModalError";
 
 function SolicitudAVO() {
   const dias = [...Array(31).keys()].map((i) => i + 1);
@@ -43,9 +44,10 @@ function SolicitudAVO() {
   const handleBack = () => navigate(-1);
   const [isChecked, setIsChecked] = useState(false);
   const [estaCargando, setEstaCargando] = useState(false);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  let [nombreAVO, setNombreAVO] = useState("Nombre...");
-  let [apellidoAVO, setApellidoAVO] = useState("Apellido...");
+  const { isOpen: isOpen1, onOpen: onOpen1, onClose: onClose1 } = useDisclosure();
+  const { isOpen: isOpen2, onOpen: onOpen2, onClose: onClose2 } = useDisclosure();
+  let [nombreAVO, setNombreAVO] = useState("");
+  let [apellidoAVO, setApellidoAVO] = useState("");
   const [fechaNacimiento, setFechaNacimiento] = useState({
     dia: "1",
     mes: "10",
@@ -71,39 +73,48 @@ function SolicitudAVO() {
   };
 
   const handleOnClickSubmitAVO = () => {
-    if (esValidoApellido() && esValidoNombre()) {
-      onOpen();
+    if (esValidoApellido() && esValidoNombre() && apellidoAVO.trim() && nombreAVO.trim()) {
+      onOpen1();
+    }else{
+      onOpen2()
     }
   };
 
   const esValidoApellido = () => {
-    return apellidoAVO.match(/[a-zA-Z]\w+/g);
+    return !apellidoAVO.match(/\d+/g)
   };
 
   const esValidoNombre = () => {
-    return nombreAVO.match(/[a-zA-Z]\w+/g);
+    return !nombreAVO.match(/\d+/g)
   };
 
   const handleConfirmacion = () => {
     setEstaCargando(true);
-    return tramiteService
-      .cargarAVO(
-        {
-          nombre: nombreAVO,
-          apellido: apellidoAVO,
-          fechaNacimiento: `${
-            fechaNacimiento.dia < 10
-              ? "0" + fechaNacimiento.dia
-              : fechaNacimiento.dia
-          }/${
-            fechaNacimiento.mes < 10
-              ? "0" + fechaNacimiento.mes
-              : fechaNacimiento.mes
-          }/${fechaNacimiento.anio}`,
-          sexo: sexoAVO,
-        },
-        1
-      )
+  
+    tramiteService
+      .buscarPorUsuario(idUsuario)
+      .then((response) => {
+        const tramite = response.data;
+        const idTramite = tramite.id; 
+  
+        return tramiteService.cargarAVO(
+          {
+            nombre: nombreAVO,
+            apellido: apellidoAVO,
+            fechaNacimiento: `${
+              fechaNacimiento.dia < 10
+                ? "0" + fechaNacimiento.dia
+                : fechaNacimiento.dia
+            }/${
+              fechaNacimiento.mes < 10
+                ? "0" + fechaNacimiento.mes
+                : fechaNacimiento.mes
+            }/${fechaNacimiento.anio}`,
+            sexo: sexoAVO,
+          },
+          idTramite
+        );
+      })
       .then((response) => {
         setEstaCargando(false);
         navigate(`/home/solicitante/${idUsuario}`);
@@ -364,9 +375,17 @@ function SolicitudAVO() {
         datoAConfirmar={
           "En cualquier caso, podés modificarlos desde tu perfil ;)"
         }
-        isOpen={isOpen}
-        onClose={onClose}
+        isOpen={isOpen1}
+        onClose={onClose1}
         handleConfirmacion={() => handleConfirmacion()}
+      />
+      <ModalError
+        pregunta={"Los datos ingresados no son correctos."}
+        datoAConfirmar={
+          "Por favor ingrese todos los datos correctamente"
+        }
+        isOpen={isOpen2}
+        onClose={onClose2}
       />
       <ModalIsLoading
         mensaje={"Esperanos mientras guardamos los datos de tu AVO... ;)"}
