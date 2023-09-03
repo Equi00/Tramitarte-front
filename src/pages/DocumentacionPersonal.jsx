@@ -24,7 +24,7 @@ function DocumentacionPersonal() {
   const { isOpen, onToggle } = useDisclosure();
   const [estaModalAbierto, setEstaModalAbierto] = useState(false);
   const [estaCargando, setEstaCargando] = useState(false);
-  const { isOpen: isOpenModal, onOpen: onOpenModal, onClose: onCloseModal } = useDisclosure();
+  const { isOpen: isOpenError, onOpen: onOpenError, onClose: onCloseError } = useDisclosure();
   const [documentacionSolicitante, setDocumentacionSolicitante] = useState({
     dniFrente: { tipo: "", nombre: "", archivoBase64: "" },
     dniDorso: { tipo: "", nombre: "", archivoBase64: "" },
@@ -36,8 +36,11 @@ function DocumentacionPersonal() {
   };
 
   const abrirModal = () => {
-    setEstaModalAbierto(true);
-    
+    if(documentacionSolicitante.dniFrente.nombre === "" || documentacionSolicitante.dniDorso.nombre === "" || documentacionSolicitante.certificadoNacimiento.nombre === ""){
+      onOpenError()
+    }else{
+      setEstaModalAbierto(true);
+    }
   };
 
   const cerrarModal = () => {
@@ -46,10 +49,6 @@ function DocumentacionPersonal() {
 
   const completarDocumentacionSolicitante = async ({ id, archivo }) => {
       if (id === "dni-frente") {
-        let verificacion = await tramiteService.esDniFrente(archivo)
-        if(verificacion === false){
-          onOpenModal()
-        }else{
         let archivoBase64 = await fileToBase64(archivo);
         setDocumentacionSolicitante({
           dniFrente: {
@@ -70,12 +69,7 @@ function DocumentacionPersonal() {
           },
         });
       }
-      }
       if (id === "dni-dorso") {
-        let verificacion = await tramiteService.esDniDorso(archivo)
-        if(verificacion === false){
-          onOpenModal()
-        }else{
         let archivoBase64 = await fileToBase64(archivo);
         setDocumentacionSolicitante({
           dniFrente: {
@@ -96,13 +90,7 @@ function DocumentacionPersonal() {
           },
         });
       }
-      }
       if (id === "certificado-nacimiento") {
-        let verificacion = await tramiteService.esCertificado(archivo)
-        console.log(verificacion)
-        if(verificacion === false){
-          onOpenModal()
-        }else{
         let archivoBase64 = await fileToBase64(archivo);
         setDocumentacionSolicitante({
           dniFrente: {
@@ -122,37 +110,36 @@ function DocumentacionPersonal() {
           },
         });
       }
-      }
   };
 
   const handleConfirmacion = async () => {
-    cerrarModal();
-    setEstaCargando(true);
-    console.log("acá", [
-      documentacionSolicitante.dniFrente,
-      documentacionSolicitante.dniDorso,
-      documentacionSolicitante.certificadoNacimiento,
-    ]);
-    let tramite = JSON.parse(window.localStorage.getItem("tramite"));
-    try {
-      let respuesta = await tramiteService.cargarDocumentacionPersonal(
-        [
-          documentacionSolicitante.dniFrente,
-          documentacionSolicitante.dniDorso,
-          documentacionSolicitante.certificadoNacimiento,
-        ],
-        Number(tramite.id)
-      );
-      console.log(respuesta);
-      setEstaCargando(false);
-      navigate(
-        `/home/solicitante/${
-          JSON.parse(window.localStorage.getItem("usuarioLogueado")).id
-        }`
-      );
-    } catch (error) {
-      navigate("/network-error");
-    }
+      cerrarModal();
+      setEstaCargando(true);
+      console.log("acá", [
+        documentacionSolicitante.dniFrente,
+        documentacionSolicitante.dniDorso,
+        documentacionSolicitante.certificadoNacimiento,
+      ]);
+      let tramite = JSON.parse(window.localStorage.getItem("tramite"));
+      try {
+        let respuesta = await tramiteService.cargarDocumentacionPersonal(
+          [
+            documentacionSolicitante.dniFrente,
+            documentacionSolicitante.dniDorso,
+            documentacionSolicitante.certificadoNacimiento,
+          ],
+          Number(tramite.id)
+        );
+        console.log(respuesta);
+        setEstaCargando(false);
+        navigate(
+          `/home/solicitante/${
+            JSON.parse(window.localStorage.getItem("usuarioLogueado")).id
+          }`
+        );
+      } catch (error) {
+        navigate("/network-error");
+      }
   };
 
   function fileToBase64(archivo) {
@@ -253,12 +240,12 @@ function DocumentacionPersonal() {
         onClose={cerrarModal}
       />
       <ModalError
-        pregunta={"El archivo seleccionado no es valido"}
+        pregunta={"Falta ingresar uno o mas archivos"}
         datoAConfirmar={
-          "Por favor elija el archivo correspondiente para continuar"
+          "Por favor ingrese todos los archivos necesarios para completar esta etapa"
         }
-        isOpen={isOpenModal}
-        onClose={onCloseModal}
+        isOpen={isOpenError}
+        onClose={onCloseError}
       />
       <ModalIsLoading
         mensaje={"Esperanos mientras guardamos la documentación ;)"}

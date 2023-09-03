@@ -66,25 +66,10 @@ class TramiteService {
 
   async esCertificado(pdfFile) {
     const formData = new FormData();
-    formData.append("pdf", pdfFile); // Cambia "img" a "pdf" para reflejar el nombre del campo en tu backend
+    formData.append("pdf", pdfFile);
   
-    try {
-      const response = await axios.post(`${this.urlBackend}/ocr/pdf/is_certificate`, formData); // Cambia la URL para reflejar la ruta correcta en tu backend
-      return response.data;
-    } catch (error) {
-      // Captura errores Axios
-      if (error.response) {
-        // La solicitud fue realizada y el servidor respondió con un código de estado diferente de 2xx
-        console.error("Error de respuesta del servidor:", error.response.data);
-      } else if (error.request) {
-        // La solicitud fue realizada pero no se recibió respuesta del servidor
-        console.error("No se recibió respuesta del servidor:", error.request);
-      } else {
-        // Ocurrió un error antes de que se realizara la solicitud
-        console.error("Error al procesar la solicitud:", error.message);
-      }
-      throw error;
-    }
+    const response = await axios.post(`http://localhost:8585/api/ocr/pdf/is_certificate`, formData);
+    return response.data;
   }
 
   async eliminar(idTramite) {

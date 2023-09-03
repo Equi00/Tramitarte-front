@@ -10,25 +10,34 @@ import {
 } from "@chakra-ui/react";
 import { ArrowBack } from "@mui/icons-material";
 import { useNavigate } from "react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModalConfirmacion from "../components/ModalConfirmacion";
 import ModalIsLoading from "../components/ModalIsLoading";
 import DocumentacionAVO from "../components/documentacionSolicitante/DocumentacionAVO";
 import tramiteService from "../services/TramiteService";
+import ModalError from "../components/ModalError";
 function ArchivosAVO() {
   const navigate = useNavigate();
   const { isOpen } = useDisclosure();
   const [estaCargando, setEstaCargando] = useState(false);
   const [estaModalAbierto, setEstaModalAbierto] = useState(false);
+  const { isOpen: isOpenError, onOpen: onOpenError, onClose: onCloseError } = useDisclosure();
+  const { isOpen: isOpenNoObligatorio1, onToggle: onToggle1 } = useDisclosure();
+  const { isOpen: isOpenNoObligatorio2, onToggle: onToggle2 } = useDisclosure();
   const [documentacionAVO, setDocumentacionAVO] = useState({
     certificadoNacimiento: { tipo: "", nombre: "", archivoBase64: "" },
-    certificadoMatrimonio: null,
-    certificadoDefuncion: null,
+    certificadoMatrimonio: { tipo: "", nombre: "", archivoBase64: "" },
+    certificadoDefuncion: { tipo: "", nombre: "", archivoBase64: "" },
   });
   const handleBack = () => navigate(-1);
 
   const abrirModal = () => {
-    setEstaModalAbierto(true);
+    if(documentacionAVO.certificadoNacimiento.nombre === "" || (isOpenNoObligatorio1 === true && documentacionAVO.certificadoDefuncion.nombre === "") 
+    || (isOpenNoObligatorio2 === true && documentacionAVO.certificadoMatrimonio.nombre === "")){
+      onOpenError()
+    }else{
+      setEstaModalAbierto(true);
+    }
   };
 
   const cerrarModal = () => {
@@ -142,6 +151,51 @@ function ArchivosAVO() {
       navigate("/network-error");
     }
   };
+
+  useEffect(() => {
+    if(isOpenNoObligatorio1 === false){
+      setDocumentacionAVO({
+        certificadoDefuncion: {
+          tipo: "",
+          nombre: "",
+          archivoBase64: "",
+        },
+        certificadoMatrimonio: documentacionAVO.certificadoMatrimonio ?? {
+          tipo: documentacionAVO.certificadoMatrimonio.tipo,
+          nombre: documentacionAVO.certificadoMatrimonio.nombre,
+          archivoBase64: documentacionAVO.certificadoMatrimonio.archivoBase64,
+        },
+        certificadoNacimiento: {
+          tipo: documentacionAVO.certificadoNacimiento.tipo,
+          nombre: documentacionAVO.certificadoNacimiento.nombre,
+          archivoBase64: documentacionAVO.certificadoNacimiento.archivoBase64,
+        },
+      });
+    }
+  }, [isOpenNoObligatorio1])
+
+  useEffect(() => {
+    if(isOpenNoObligatorio2 === false){
+      setDocumentacionAVO({
+        certificadoDefuncion: documentacionAVO.certificadoDefuncion && {
+          tipo: documentacionAVO.certificadoDefuncion.tipo,
+          nombre: documentacionAVO.certificadoDefuncion.nombre,
+          archivoBase64: documentacionAVO.certificadoDefuncion.archivoBase64,
+        },
+        certificadoMatrimonio: {
+          tipo: "",
+          nombre: "",
+          archivoBase64: "",
+        },
+        certificadoNacimiento: {
+          tipo: documentacionAVO.certificadoNacimiento.tipo,
+          nombre: documentacionAVO.certificadoNacimiento.nombre,
+          archivoBase64: documentacionAVO.certificadoNacimiento.archivoBase64,
+        },
+      });
+    }
+  }, [isOpenNoObligatorio2])
+
   return (
     <Box minH="100%" h="auto" bg="teal.200">
       <Flex w="100%" p=".8rem" justify="space-between">
@@ -190,7 +244,7 @@ function ArchivosAVO() {
                 {"Documentación AVO"}
               </Text>
             </Flex>
-            <DocumentacionAVO agregarDocumentacionAVO={completarDocumentacionAVO} />
+            <DocumentacionAVO agregarDocumentacionAVO={completarDocumentacionAVO} isOpenNO1={isOpenNoObligatorio1} onToggle1={onToggle1} isOpenNO2={isOpenNoObligatorio2} onToggle2={onToggle2} />
           </Flex>
           <Flex justifyContent="center" w="full" py="16">
             <Button
@@ -215,6 +269,14 @@ function ArchivosAVO() {
         isOpen={estaModalAbierto}
         handleConfirmacion={handleConfirmacion}
         onClose={cerrarModal}
+      />
+      <ModalError
+        pregunta={"Falta ingresar uno o mas archivos"}
+        datoAConfirmar={
+          "Por favor ingrese todos los archivos necesarios para completar esta etapa"
+        }
+        isOpen={isOpenError}
+        onClose={onCloseError}
       />
       <ModalIsLoading
         mensaje={"Esperanos mientras guardamos la documentación ;)"}

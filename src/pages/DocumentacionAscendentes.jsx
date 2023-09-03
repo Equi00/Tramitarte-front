@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -14,17 +14,13 @@ import {
 import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import { useNavigate } from "react-router";
 import DocumentacionAVO from "../components/documentacionSolicitante/DocumentacionAVO";
+import DocumentacionAscendentesArchivo from "../components/documentacionSolicitante/DocumentacionAscendentes";
 
 function DocumentacionAscendentes() {
   const navigate = useNavigate();
   const { isOpen, onToggle } = useDisclosure();
   const [cantidadAncestros, setCantidadAncestros] = useState(0);
   const [estaModalAbierto, setEstaModalAbierto] = useState(false);
-  const [documentacionAVO, setDocumentacionAVO] = useState({
-    certificadoMatrimonio: { nombre: "", archivoBase64: "" },
-    certificadoDefuncion: { nombre: "", archivoBase64: "" },
-    certificadoNacimiento: { nombre: "", archivoBase64: "" },
-  });
   const [documentacionAncestros, setDocumentacionAncestros] = useState([]);
 
   const handleBack = () => {
@@ -32,12 +28,69 @@ function DocumentacionAscendentes() {
   };
 
   const handleOnInput = (e) => {
-    setCantidadAncestros(Number(e.target.value));
+    const cantidadAncestros = Number(e.target.value);
+    setCantidadAncestros(cantidadAncestros);
+  
+    const personas = Array(cantidadAncestros).fill({
+      certificadoDefuncion: { tipo: "", nombre: "", archivoBase64: "" },
+      certificadoMatrimonio: { tipo: "", nombre: "", archivoBase64: "" },
+      certificadoNacimiento: { tipo: "", nombre: "", archivoBase64: "" },
+      opcional1: false,
+      opcional2: false
+    });
+  
+    setDocumentacionAncestros(personas);
+  };
+
+  const completarDocumentacionDescendientes = async ({ index, id, archivo }) => {
+    const personasActualizadas = [...documentacionAncestros]; // Clona la lista de personas
+  
+    if (id === "certificado-defuncion") {
+      const archivoBase64 = await fileToBase64(archivo);
+      personasActualizadas[index].certificadoDefuncion = {
+        tipo: "certificado-defuncion",
+        nombre: archivo.name,
+        archivoBase64: "",
+      }
+    }
+    if (id === "certificado-matrimonio") {
+      const archivoBase64 = await fileToBase64(archivo);
+      personasActualizadas[index].certificadoMatrimonio = {
+        tipo: "certificado-matrimonio",
+        nombre: archivo.name,
+        archivoBase64: "",
+      };
+    }
+    if (id === "certificado-nacimiento") {
+      const archivoBase64 = await fileToBase64(archivo);
+      personasActualizadas[index].certificadoNacimiento = {
+        tipo: "certificado-nacimiento",
+        nombre: archivo.name,
+        archivoBase64: "",
+      };
+    }
+  
+    setDocumentacionAncestros(personasActualizadas); // Actualiza el estado con la nueva lista de personas
   };
 
   const abrirModal = () => {
     setEstaModalAbierto(true);
   };
+
+  function fileToBase64(archivo) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(archivo);
+
+      reader.onloadend = () => {
+        resolve(reader.result);
+      };
+
+      reader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  }
 
   return (
     <Box minH="100%" h="auto" bg="teal.200">
@@ -136,32 +189,10 @@ function DocumentacionAscendentes() {
               fontSize={"2xl"}
               fontWeight={300}
             >
-              {"Documentación AVO"}
-            </Text>
-            <DocumentacionAVO />
-          </Flex>
-          <Flex
-            textAlign="center"
-            flexDirection="column"
-            justifyContent="center"
-            pb="2%"
-            w={"full"}
-          >
-            <Text
-              w="85%"
-              alignSelf="center"
-              borderTopRadius="15px"
-              bg="teal.200"
-              color="white"
-              borderColor="teal.300"
-              borderWidth="1px"
-              as={"h2"}
-              fontSize={"2xl"}
-              fontWeight={300}
-            >
               {"Documentación Ascendentes"}
             </Text>
-            <DocumentacionAscendentes cantidadAscendentes={cantidadAncestros} />
+            <DocumentacionAscendentesArchivo cantidadAscendentes={cantidadAncestros} personas={documentacionAncestros} agregarDocumentacionDescendiente={completarDocumentacionDescendientes}
+            setPersonas={setDocumentacionAncestros} />
           </Flex>
           <Flex w="full" py="4">
             <Button
