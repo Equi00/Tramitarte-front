@@ -77,7 +77,7 @@ function Etapa({ tramite }) {
       case "CARGAR DOCUMENTACIÓN DE DESCENDIENTES":
         completePath = `${basePath}/documentacion-ascendentes`;
         break;
-      case "TRADUCIR TODA LA DOCUMENTACIÓN":
+      case "CARGAR DOCUMENTACIÓN TRADUCIDA":
         completePath = `${basePath}/documentacion-traducida`;
         break;
     }

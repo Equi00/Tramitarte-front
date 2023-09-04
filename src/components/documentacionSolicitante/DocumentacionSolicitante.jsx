@@ -22,7 +22,7 @@ function DocumentacionSolicitante({
       id: "dni-frente",
       archivo: archivo,
     });
-    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 50) + '...' : archivo.name;
+    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
     setNombre1(nombreRecortado)
     }
   };
@@ -37,7 +37,7 @@ function DocumentacionSolicitante({
       id: "dni-dorso",
       archivo: archivo,
     });
-    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 50) + '...' : archivo.name;
+    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
     setNombre2(nombreRecortado)
     }
   };
@@ -52,7 +52,7 @@ function DocumentacionSolicitante({
       id: "certificado-nacimiento",
       archivo: archivo,
     });
-    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 50) + '...' : archivo.name;
+    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
     setNombre3(nombreRecortado)
     }
   };

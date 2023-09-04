@@ -54,7 +54,7 @@ function DocumentacionPersonal() {
           dniFrente: {
             tipo: "dni-frente",
             nombre: archivo.name,
-            archivoBase64: "",
+            archivoBase64: archivoBase64,
           },
           dniDorso: {
             tipo: documentacionSolicitante.dniDorso.tipo,
@@ -80,7 +80,7 @@ function DocumentacionPersonal() {
           dniDorso: {
             tipo: "dni-dorso",
             nombre: archivo.name,
-            archivoBase64: "",
+            archivoBase64: archivoBase64,
           },
           certificadoNacimiento: {
             tipo: documentacionSolicitante.certificadoNacimiento.tipo,
@@ -106,7 +106,7 @@ function DocumentacionPersonal() {
           certificadoNacimiento: {
             tipo: "certificado-nacimiento",
             nombre: archivo.name,
-            archivoBase64: "",
+            archivoBase64: archivoBase64,
           },
         });
       }

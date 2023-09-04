@@ -21,7 +21,7 @@ function DocumentacionAVO({ agregarDocumentacionAVO, isOpenNO1, onToggle1, isOpe
       id: "certificado-defuncion",
       archivo: archivo,
     });
-    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 50) + '...' : archivo.name;
+    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
     setNombre1(nombreRecortado)
   }
   };
@@ -36,7 +36,7 @@ function DocumentacionAVO({ agregarDocumentacionAVO, isOpenNO1, onToggle1, isOpe
       id: "certificado-matrimonio",
       archivo: archivo,
     });
-    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 50) + '...' : archivo.name;
+    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
     setNombre2(nombreRecortado)
   }
   };
@@ -51,7 +51,7 @@ function DocumentacionAVO({ agregarDocumentacionAVO, isOpenNO1, onToggle1, isOpe
       id: "certificado-nacimiento",
       archivo: archivo,
     });
-    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 50) + '...' : archivo.name;
+    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
     setNombre3(nombreRecortado)
   }
   };
