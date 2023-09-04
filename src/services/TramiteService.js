@@ -48,6 +48,30 @@ class TramiteService {
     return tramitePersistido;
   }
 
+  async esDniFrente(imgFile) {
+    const formData = new FormData();
+    formData.append("img", imgFile);
+  
+    const response = await axios.post(`${this.urlBackend}/ocr/image/is_dni_frente`, formData);
+    return response.data;
+  }
+
+  async esDniDorso(imgFile) {
+    const formData = new FormData();
+    formData.append("img", imgFile);
+  
+    const response = await axios.post(`${this.urlBackend}/ocr/image/is_dni_dorso`, formData);
+    return response.data;
+  }
+
+  async esCertificado(pdfFile) {
+    const formData = new FormData();
+    formData.append("pdf", pdfFile);
+  
+    const response = await axios.post(`http://localhost:8585/api/ocr/pdf/is_certificate`, formData);
+    return response.data;
+  }
+
   async eliminar(idTramite) {
     await axios.delete(`${this.urlBackend}/tramite/${idTramite}`);
   }

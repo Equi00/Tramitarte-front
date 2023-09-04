@@ -13,8 +13,7 @@ import {
 } from "@chakra-ui/react";
 import InputFile from "./InputFile";
 
-function InputCertficadoNoObligatorio({ preguntaConfirmacion, accion, handleOnInput }) {
-  const { isOpen, onToggle } = useDisclosure();
+function InputCertficadoNoObligatorio({ preguntaConfirmacion, accion, handleOnInput, isOpen, onToggle }) {
   return (
     <Flex
       color="blue.900"
