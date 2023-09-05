@@ -48,11 +48,13 @@ function ArchivosAVO() {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(archivo);
-
+  
       reader.onloadend = () => {
-        resolve(reader.result);
+        const base64File = reader.result.split(",")[1];
+  
+        resolve(base64File);
       };
-
+  
       reader.onerror = (error) => {
         reject(error);
       };
@@ -66,7 +68,7 @@ function ArchivosAVO() {
         certificadoDefuncion: {
           tipo: "certificado-defuncion",
           nombre: archivo.name,
-          archivoBase64: "",
+          archivoBase64: archivoBase64,
         },
         certificadoMatrimonio: documentacionAVO.certificadoMatrimonio ?? {
           tipo: documentacionAVO.certificadoMatrimonio.tipo,
@@ -91,7 +93,7 @@ function ArchivosAVO() {
         certificadoMatrimonio: {
           tipo: "certificado-matrimonio",
           nombre: archivo.name,
-          archivoBase64: "",
+          archivoBase64: archivoBase64,
         },
         certificadoNacimiento: {
           tipo: documentacionAVO.certificadoNacimiento.tipo,
@@ -116,7 +118,7 @@ function ArchivosAVO() {
         certificadoNacimiento: {
           tipo: "certificado-nacimiento",
           nombre: archivo.name,
-          archivoBase64: "",
+          archivoBase64: archivoBase64,
         },
       });
     }
@@ -130,16 +132,24 @@ function ArchivosAVO() {
       documentacionAVO.certificadoMatrimonio,
       documentacionAVO.certificadoNacimiento,
     ]);
+    let documentos = []
     let tramite = JSON.parse(window.localStorage.getItem("tramite"));
     try {
+      const documentosAVO = [
+        documentacionAVO.certificadoDefuncion,
+        documentacionAVO.certificadoMatrimonio,
+        documentacionAVO.certificadoNacimiento,
+      ];
+  
+      const archivosConNombre = documentosAVO.filter((archivo) => archivo.nombre !== "");
+  
+      documentos.push(...archivosConNombre);
+
       let respuesta = await tramiteService.cargarDocumentacionAVO(
-        [
-          documentacionAVO.certificadoDefuncion,
-          documentacionAVO.certificadoMatrimonio,
-          documentacionAVO.certificadoNacimiento,
-        ],
+        documentos,
         Number(tramite.id)
       );
+      console.log(documentos)
       console.log(respuesta);
       setEstaCargando(false);
       navigate(

@@ -76,19 +76,19 @@ function DocumentacionAscendentes() {
       ascendente.certificadoDefuncion = {
         tipo: "certificado-defuncion",
         nombre: archivo.name,
-        archivoBase64: "",
+        archivoBase64: archivoBase64,
       };
     } else if (id === "certificado-matrimonio") {
       ascendente.certificadoMatrimonio = {
         tipo: "certificado-matrimonio",
         nombre: archivo.name,
-        archivoBase64: "",
+        archivoBase64: archivoBase64,
       };
     } else if (id === "certificado-nacimiento") {
       ascendente.certificadoNacimiento = {
         tipo: "certificado-nacimiento",
         nombre: archivo.name,
-        archivoBase64: "",
+        archivoBase64: archivoBase64,
       };
     }
   
@@ -126,15 +126,22 @@ function DocumentacionAscendentes() {
     let documentos = []
 
     try {
-      documentacionAncestros.map((persona) => {
-        documentos.push(persona.certificadoDefuncion);
-        documentos.push(persona.certificadoMatrimonio);
-        documentos.push(persona.certificadoNacimiento);
+      documentacionAncestros.forEach((persona) => {
+        if (persona.certificadoDefuncion.nombre !== "") {
+          documentos.push(persona.certificadoDefuncion);
+        }
+        if (persona.certificadoMatrimonio.nombre !== "") {
+          documentos.push(persona.certificadoMatrimonio);
+        }
+        if (persona.certificadoNacimiento.nombre !== "") {
+          documentos.push(persona.certificadoNacimiento);
+        }
       });
 
-      console.log(documentos)
+      
 
       let respuesta = await tramiteService.cargarDocumentacionAncestros(documentos, Number(tramite.id));
+      console.log(documentos)
       console.log(respuesta);
       setEstaCargando(false);
       navigate(
@@ -151,11 +158,13 @@ function DocumentacionAscendentes() {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(archivo);
-
+  
       reader.onloadend = () => {
-        resolve(reader.result);
+        const base64File = reader.result.split(",")[1];
+  
+        resolve(base64File);
       };
-
+  
       reader.onerror = (error) => {
         reject(error);
       };
