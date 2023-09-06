@@ -5,20 +5,24 @@ import { Box, Center, useDisclosure } from "@chakra-ui/react";
 import tramiteService from "../../services/TramiteService";
 import ModalError from "../ModalError";
 import InputCertficadoNoObligatorioMultiple from "./InputCertificadoNoObligatorioMultiple";
+import ModalIsLoading from "../ModalIsLoading";
 
 function DocumentacionAscendentesArchivo({ cantidadAscendentes, personas, setDocumentacionAncestros, quitarDocumentos, setCheck1, setCheck2 }) {
   const [nombre1, setNombre1] = useState([]);
   const [nombre2, setNombre2] = useState([]);
   const [nombre3, setNombre3] = useState([]);
+  const [estaCargando, setEstaCargando] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [verificado1, setVerificado1] = useState([])
   const [verificado2, setVerificado2] = useState([])
 
   const handleInputCertificadoDefuncion = async (e, index) => {
     const archivo = e.target.files[0];
+    setEstaCargando(true)
     const verificacion = await tramiteService.esCertificado(archivo);
     
     if (verificacion === false) {
+      setEstaCargando(false)
       onOpen();
     } else {
       setDocumentacionAncestros({
@@ -35,13 +39,16 @@ function DocumentacionAscendentesArchivo({ cantidadAscendentes, personas, setDoc
         return nuevosNombres;
       });
     }
+    setEstaCargando(false)
   }
 
   const handleInputCertificadoMatrimonio = async (e, index) => {
     const archivo = e.target.files[0];
-    const verificacion = await tramiteService.esCertificado(archivo);
+    setEstaCargando(true)
+    const verificacion = await tramiteService.esCertificadoMatrimonio(archivo);
     
     if (verificacion === false) {
+      setEstaCargando(false)
       onOpen();
     } else {
       setDocumentacionAncestros({
@@ -58,13 +65,16 @@ function DocumentacionAscendentesArchivo({ cantidadAscendentes, personas, setDoc
         return nuevosNombres;
       });
     }
+    setEstaCargando(false)
   }
 
   const handleInputCertificadoNacimiento = async (e, index) => {
     const archivo = e.target.files[0];
-    const verificacion = await tramiteService.esCertificado(archivo);
+    setEstaCargando(true)
+    const verificacion = await tramiteService.esCertificadoNacimiento(archivo);
     
     if (verificacion === false) {
+      setEstaCargando(false)
       onOpen();
     } else {
       setDocumentacionAncestros({
@@ -81,6 +91,7 @@ function DocumentacionAscendentesArchivo({ cantidadAscendentes, personas, setDoc
         return nuevosNombres;
       });
     }
+    setEstaCargando(false)
   }
 
   useEffect(() => { //seteo todos los valores standar segun la cantidad de descendientes
@@ -164,9 +175,15 @@ function DocumentacionAscendentesArchivo({ cantidadAscendentes, personas, setDoc
       ))}
       <ModalError
         pregunta={"El archivo seleccionado no es valido"}
-        datoAConfirmar={"Por favor elija el archivo correspondiente para continuar"}
+        datoAConfirmar={
+          "Por favor elija el archivo correspondiente para continuar. En caso de que el archivo sea el correcto, vuelva a intentarlo con imagenes en mejor resolucion y mas claras."
+        }
         isOpen={isOpen}
         onClose={onClose}
+      />
+      <ModalIsLoading
+        mensaje={"Esperanos mientras guardamos la documentación ;)"}
+        isOpen={estaCargando}
       />
     </Box>
   );

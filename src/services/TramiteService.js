@@ -68,7 +68,31 @@ class TramiteService {
     const formData = new FormData();
     formData.append("pdf", pdfFile);
   
-    const response = await axios.post(`http://localhost:8585/api/ocr/pdf/is_certificate`, formData);
+    const response = await axios.post(`${this.urlBackend}/ocr/pdf/is_certificate`, formData);
+    return response.data;
+  }
+
+  async esCertificadoNacimiento(pdfFile) {
+    const formData = new FormData();
+    formData.append("pdf", pdfFile);
+  
+    const response = await axios.post(`${this.urlBackend}/ocr/pdf/is_birth`, formData);
+    return response.data;
+  }
+
+  async esCertificadoMatrimonio(pdfFile) {
+    const formData = new FormData();
+    formData.append("pdf", pdfFile);
+  
+    const response = await axios.post(`${this.urlBackend}/ocr/pdf/is_marriage`, formData);
+    return response.data;
+  }
+
+  async esCertificadoDefuncion(pdfFile) {
+    const formData = new FormData();
+    formData.append("pdf", pdfFile);
+  
+    const response = await axios.post(`${this.urlBackend}/ocr/pdf/is_death`, formData);
     return response.data;
   }
 
