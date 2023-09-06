@@ -5,14 +5,40 @@ import {
   AccordionPanel,
   Text,
   Link,
+  useDisclosure,
 } from "@chakra-ui/react";
 
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import Map from "./Map";
+import { useRef, useState } from "react";
+import MapFamilySearch from "./MapFamilySearch";
+import MapTraductores from "./MapTraductores";
 
 export default function Faq() {
+  const [onOpenMap1, onToggleMap1] = useState(false)
+  const [onOpenMap2, onToggleMap2] = useState(false)
+  const [onOpenMap3, onToggleMap3] = useState(false)
+
+  const renderizarMapa1 = () => {
+    setTimeout(() => {
+      onToggleMap1(!onOpenMap1);
+    }, 1);
+  }
+
+  const renderizarMapa2 = () => {
+    setTimeout(() => {
+      onToggleMap2(!onOpenMap2);
+    }, 1);
+  }
+
+  const renderizarMapa3 = () => {
+    setTimeout(() => {
+      onToggleMap3(!onOpenMap2);
+    }, 1);
+  }
+
   return (
     <Accordion
       bg="white"
@@ -64,6 +90,7 @@ export default function Faq() {
           justifyContent="space-between"
           p={4}
           _hover={{ bg: "teal.300" }}
+          onClick={renderizarMapa1}
         >
           <Text fontSize="md">
             {"¿Dónde está el consulado italiano más cercano?"}
@@ -71,7 +98,47 @@ export default function Faq() {
           <ChevronDownIcon fontSize="24px" />
         </AccordionButton>
         <AccordionPanel pb={4}>
-          <Map />
+          <Map bool={onOpenMap1} />
+        </AccordionPanel>
+      </AccordionItem>
+      <AccordionItem>
+        <AccordionButton
+          display="flex"
+          bg="teal.300"
+          color="white"
+          alignItems="center"
+          justifyContent="space-between"
+          p={4}
+          _hover={{ bg: "teal.300" }}
+          onClick={renderizarMapa2}
+        >
+          <Text fontSize="md">
+            {"¿Dónde está el centro de Family Search más cercano?"}
+          </Text>
+          <ChevronDownIcon fontSize="24px" />
+        </AccordionButton>
+        <AccordionPanel pb={4}>
+          <MapFamilySearch bool={onOpenMap2} />
+        </AccordionPanel>
+      </AccordionItem>
+      <AccordionItem>
+        <AccordionButton
+          display="flex"
+          bg="teal.300"
+          color="white"
+          alignItems="center"
+          justifyContent="space-between"
+          p={4}
+          _hover={{ bg: "teal.300" }}
+          onClick={renderizarMapa3}
+        >
+          <Text fontSize="md">
+            {"¿Dónde está el Traductor más cercano?"}
+          </Text>
+          <ChevronDownIcon fontSize="24px" />
+        </AccordionButton>
+        <AccordionPanel pb={4}>
+          <MapTraductores bool={onOpenMap3} />
         </AccordionPanel>
       </AccordionItem>
       <AccordionItem>
@@ -110,9 +177,9 @@ export default function Faq() {
         </AccordionButton>
         <AccordionPanel pb={4}>
           <Text>
-            {`En el sitio oficial de la comuna puede aparecer como:
-              <p>1- Ufficio Anagrafe</p>
-              <p>2- Ufficio di Stato Civile</p>`}
+            En el sitio oficial de la comuna puede aparecer como:
+            <p>1- Ufficio Anagrafe</p>
+            <p>2- Ufficio di Stato Civile</p>
           </Text>
         </AccordionPanel>
       </AccordionItem>

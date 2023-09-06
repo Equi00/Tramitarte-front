@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import logo from "../assets/logo.png";
 import consulados from "../data/consulados";
 
-function Map() {
+function Map({bool}) {
   useEffect(() => {
     const centroDelPais = [-34.6989, -65.0379677];
     const map = L.map("map").setView(centroDelPais, 5);
@@ -62,7 +62,7 @@ function Map() {
     return () => {
       map.remove();
     };
-  }, []);
+  }, [bool]);
 
   return <div id="map" style={{ height: "450px" }}></div>;
 }
