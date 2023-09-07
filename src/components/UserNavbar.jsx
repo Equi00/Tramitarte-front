@@ -98,7 +98,7 @@ export default function UserNavbar({ usuarioLogueado }) {
       icono: <Icon color="white" as={FolderCopy} bg="teal.300" boxSize={8} />,
     },
     {
-      hipervinculo: "/solicitud-avo",
+      hipervinculo: "/avo-profile",
       texto: "Mi AVO",
       icono: (
         <Icon color="white" as={FamilyRestroom} bg="teal.300" boxSize={8} />

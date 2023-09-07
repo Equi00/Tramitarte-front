@@ -17,6 +17,8 @@ class UsuarioService {
         console.log(usuario)
         return usuario
     }
+
+   
 }
 
 const usuarioService = new UsuarioService();

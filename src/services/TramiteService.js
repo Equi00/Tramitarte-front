@@ -75,6 +75,11 @@ class TramiteService {
   async eliminar(idTramite) {
     await axios.delete(`${this.urlBackend}/tramite/${idTramite}`);
   }
+
+  async traerDatosAvo(idUsuario){
+    let avo= await axios?.get(`${this.urlBackend}/solicitud/usuario/${idUsuario}`)
+    return avo.data
+}
 }
 
 const tramiteService = new TramiteService();

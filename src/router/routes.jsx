@@ -17,6 +17,7 @@ import DocumentacionPersonal from "../pages/DocumentacionPersonal";
 import DocumentacionAscendentes from "../pages/DocumentacionAscendentes";
 import DocumentacionAVO from "../pages/ArchivosAVO";
 import ArchivosAVO from "../pages/ArchivosAVO";
+import AvoProfile from "../pages/AvoProfile";
 
 export const RouterApp = ({ setTramiteContext, setUsuarioLogueadoContext }) => {
   return (
@@ -67,6 +68,7 @@ export const RouterApp = ({ setTramiteContext, setUsuarioLogueadoContext }) => {
           <Route index element={<PedidosTraduccion />} />
         </Route>
         <Route path="/usuario" element={<UserProfile />} />
+        <Route path="/avo-profile" element={<AvoProfile />} />
         <Route path="/preguntas-frecuentes" element={<PreguntasFrecuentes />} />
         <Route path="/family-search" element={<FamilySearch />} />
         <Route path="/traductores" element={<TraductoresRegistrados />} />
