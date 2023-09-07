@@ -4,17 +4,21 @@ import InputCertficadoNoObligatorio from "./InputCertificadoNoObligatorio";
 import tramiteService from "../../services/TramiteService";
 import { useEffect, useState } from "react";
 import ModalError from "../ModalError";
+import ModalIsLoading from "../ModalIsLoading";
 
 function DocumentacionAVO({ agregarDocumentacionAVO, isOpenNO1, onToggle1, isOpenNO2, onToggle2}) {
   const [nombre1, setNombre1] = useState("certificado defuncion")
   const [nombre2, setNombre2] = useState("certificado matrimonio")
   const [nombre3, setNombre3] = useState("certificado nacimiento")
+  const [estaCargando, setEstaCargando] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleInputCertificadoDefuncion = async (e) => {
     let archivo = e.target.files[0]
+    setEstaCargando(true)
     let verificacion = await tramiteService.esCertificado(archivo)
     if(verificacion === false){
+      setEstaCargando(false)
       onOpen()
     }else{
     agregarDocumentacionAVO({
@@ -24,12 +28,15 @@ function DocumentacionAVO({ agregarDocumentacionAVO, isOpenNO1, onToggle1, isOpe
     const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
     setNombre1(nombreRecortado)
   }
+  setEstaCargando(false)
   };
 
   const handleInputCertificadoMatrimonio = async (e) => {
     let archivo = e.target.files[0]
-    let verificacion = await tramiteService.esCertificado(archivo)
+    setEstaCargando(true)
+    let verificacion = await tramiteService.esCertificadoMatrimonio(archivo)
     if(verificacion === false){
+      setEstaCargando(false)
       onOpen()
     }else{
     agregarDocumentacionAVO({
@@ -39,12 +46,15 @@ function DocumentacionAVO({ agregarDocumentacionAVO, isOpenNO1, onToggle1, isOpe
     const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
     setNombre2(nombreRecortado)
   }
+  setEstaCargando(false)
   };
 
   const handleInputCertificadoNacimiento = async (e) => {
     let archivo = e.target.files[0]
-    let verificacion = await tramiteService.esCertificado(archivo)
+    setEstaCargando(true)
+    let verificacion = await tramiteService.esCertificadoNacimiento(archivo)
     if(verificacion === false){
+      setEstaCargando(false)
       onOpen()
     }else{
     agregarDocumentacionAVO({
@@ -54,6 +64,7 @@ function DocumentacionAVO({ agregarDocumentacionAVO, isOpenNO1, onToggle1, isOpe
     const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
     setNombre3(nombreRecortado)
   }
+  setEstaCargando(false)
   };
 
   useEffect(() => {
@@ -90,10 +101,14 @@ function DocumentacionAVO({ agregarDocumentacionAVO, isOpenNO1, onToggle1, isOpe
       <ModalError
         pregunta={"El archivo seleccionado no es valido"}
         datoAConfirmar={
-          "Por favor elija el archivo correspondiente para continuar"
+          "Por favor elija el archivo correspondiente para continuar. En caso de que el archivo sea el correcto, vuelva a intentarlo con imagenes en mejor resolucion y mas claras."
         }
         isOpen={isOpen}
         onClose={onClose}
+      />
+      <ModalIsLoading
+        mensaje={"Esperanos mientras guardamos la documentación ;)"}
+        isOpen={estaCargando}
       />
     </Box>
   );
