@@ -28,6 +28,11 @@ class UsuarioService {
         let traductor = await axios?.get(`${this.urlBackend}/usuario/traductor-correo`, { params: body })
         return traductor.data
     }
+
+    async traerNotificaciones(id){
+        let notificaciones = await axios.get(`${this.urlBackend}/usuario/${id}/notificaciones`)
+        return notificaciones.data
+    }
    
 }
 

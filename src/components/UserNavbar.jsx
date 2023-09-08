@@ -40,8 +40,9 @@ import {
   Logout,
 } from "@mui/icons-material";
 import { useLocation, useNavigate, useParams } from "react-router";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import usuarioService from "../services/UsuarioService";
 
 const NavLink = ({ texto, link }) => (
   <Link
@@ -65,6 +66,7 @@ export default function UserNavbar({ usuarioLogueado }) {
   const location = useLocation();
   const { idUsuario } = useParams();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [notificaciones, setNotificacion] = useState()
   const bgColors = useColorModeValue("teal.300", "blue.900");
   const colors = useColorModeValue("white", "blue.900");
   const btnRef = useRef();
@@ -124,7 +126,20 @@ export default function UserNavbar({ usuarioLogueado }) {
     },
   ];
 
-  const notificaciones = ["Notificación 1", "Notificación 2"];
+  //const notificacionesanashe = ["Notificación 1", "Notificación 2"];
+
+  const notificacionesUsuario = async () => {
+    try{
+      let notificacion = await usuarioService.traerNotificaciones(idUsuario)
+      setNotificacion(notificacion)
+    }catch(e){
+      navigate("/network-error")
+    }
+  }
+
+  useEffect(() =>{
+    notificacionesUsuario()
+  }, [notificaciones])
 
   return (
     <>
@@ -165,18 +180,18 @@ export default function UserNavbar({ usuarioLogueado }) {
                 >
                   <TagLeftIcon key={"fal"} boxSize="8" as={Email} />
                   <TagLabel key={"rem"} ml={"-.4rem"}>
-                    {notificaciones.length}
+                    {notificaciones ? notificaciones.length : <div>no</div>}
                   </TagLabel>
                 </Tag>
               </MenuButton>
               <MenuList color={useColorModeValue("blue.900", "white")}>
-                {notificaciones.map((notificacion, index) => (
+                {notificaciones && notificaciones.length === 0 ? <div>No hay notificaciones</div>:notificaciones && notificaciones.map((notificacion, index) => (
                   <>
                     <MenuItem
                       key={index}
                       _hover={{ bg: 'useColorModeValue("blue.900", "white")' }}
                     >
-                      {notificacion}
+                      {notificacion.descripcion}
                     </MenuItem>
                   </>
                 ))}
