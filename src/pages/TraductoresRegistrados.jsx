@@ -9,41 +9,49 @@ import {
   WrapItem,
   VStack,
   Heading,
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Button,
 } from "@chakra-ui/react";
 import { ArrowBack, Send } from "@mui/icons-material";
 import { useNavigate } from "react-router";
 import SearchBar from "../components/SearchBar";
+import { useEffect, useState } from "react";
+import usuarioService from "../services/UsuarioService";
+import CardAviso from "../components/CardAviso";
 
 function TraductoresRegistrados() {
   const navigate = useNavigate();
 
-  const traductores = [
-    {
-      nombre: "Leandro",
-      apellido: "Gómez",
-      precio: "9900",
-      fotoPerfil:
-        "https://images.unsplash.com/photo-1612865547334-09cb8cb455da?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
-    },
-    {
-      nombre: "Aníbal",
-      apellido: "Troilo",
-      precio: "10500",
-      fotoPerfil:
-        "https://images.unsplash.com/photo-1612865547334-09cb8cb455da?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
-    },
-    {
-      nombre: "Solange",
-      apellido: "Estéban",
-      precio: "1200",
-      fotoPerfil:
-        "https://images.unsplash.com/photo-1612865547334-09cb8cb455da?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
-    },
-  ];
+  const [traductores, setTraductores] = useState([]) 
 
   const handleBack = () => {
     navigate(-1);
   };
+
+  const traduct = async () =>{
+    try{
+      let traductoresRegistrados = await usuarioService.traerTraductores()
+      setTraductores(traductoresRegistrados)
+    }catch(e){
+      navigate("/network-error");
+    }
+  }
+
+  const traductoresBuscados = async (mail) =>{
+    try{
+      let traductoresRegistrados = await usuarioService.buscarTraductores(mail)
+      setTraductores(traductoresRegistrados)
+    }catch(e){
+      navigate("/network-error");
+    }
+  }
+
+  useEffect(() => {
+    traduct()
+  }, [])
 
   return (
     <Box minH="100%" bg="teal.200">
@@ -60,15 +68,18 @@ function TraductoresRegistrados() {
           bg="white"
           icon={<ArrowBack />}
         />
-        <SearchBar />
+        <SearchBar funcion={traductoresBuscados}/>
       </Flex>
       <Wrap
         spacing={"1.2rem"}
         bg="teal.200"
         p="1.4rem"
+        display={"flex"}
         justifyContent={"center"}
+        alignItems={"center"}
       >
-        {traductores.map((traductor, index) => (
+        {traductores.length === 0 ? <CardAviso text={"No hay Traductores disponibles"}/> :
+        traductores.map((traductor, index) => (
           <WrapItem
             w="sm"
             borderRadius="45px"
@@ -88,7 +99,7 @@ function TraductoresRegistrados() {
             </Center>
             <Center h="100%" flexBasis="50%">
               <VStack alignItems="center" justifyContent="center">
-                <Heading textAlign="center">{traductor.nombre + ' ' + traductor.apellido}</Heading>
+                <Heading textAlign="center" fontSize={15}>{traductor.nombre + ' ' + traductor.apellido}</Heading>
                 <Text color="teal.400">{traductor.precio}</Text>
               </VStack>
             </Center>

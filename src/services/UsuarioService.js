@@ -18,6 +18,16 @@ class UsuarioService {
         return usuario
     }
 
+    async traerTraductores(){
+        let traductores = await axios.get(`${this.urlBackend}/usuario/traductores`)
+        return traductores.data
+    }
+
+    async buscarTraductores(mail){
+        let body= {"correoElectronico" : mail}
+        let traductor = await axios?.get(`${this.urlBackend}/usuario/traductor-correo`, { params: body })
+        return traductor.data
+    }
    
 }
 
