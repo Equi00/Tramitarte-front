@@ -33,7 +33,33 @@ class UsuarioService {
         let notificaciones = await axios.get(`${this.urlBackend}/usuario/${id}/notificaciones`)
         return notificaciones.data
     }
-   
+
+    async enviarNotificacion(idOrigen, idDestino, texto){
+        await axios.post(`${this.urlBackend}/notificacion/alerta-traductor/${idOrigen}/${idDestino}?descripcion=${texto}` )
+    }
+
+    async enviarAlerta(idOrigen, idDestino, texto){
+        await axios.post(`${this.urlBackend}/notificacion/alerta/${idOrigen}/${idDestino}?descripcion=${texto}` )
+    }
+
+    async buscarSolicitudTraduccion(idTraductor){
+        let solicitudes = await axios.get(`${this.urlBackend}/usuario/${idTraductor}/solicitud-traduccion`)
+        return solicitudes.data
+    }
+
+    async buscarSolicitudTraduccionSolicitante(idSolicitante){
+        let solicitudes = await axios.get(`${this.urlBackend}/usuario/${idSolicitante}/solicitud-traduccion/solicitante`)
+        return solicitudes.data
+    }
+
+    async eliminarAlerta(idAlerta){
+        await axios.delete(`${this.urlBackend}/notificacion/alerta/${idAlerta}` )
+    }
+
+    async eliminarSolicitudTraduccion(idSolicitudTraduccion){
+        await axios.delete(`${this.urlBackend}/notificacion/solicitud/${idSolicitudTraduccion}`)
+    }
+    
 }
 
 const usuarioService = new UsuarioService();

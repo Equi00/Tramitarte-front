@@ -64,16 +64,25 @@ export const RouterApp = ({ setTramiteContext, setUsuarioLogueadoContext }) => {
           path="/home/solicitante/:idUsuario/solicitud-avo"
           element={<SolicitudAVO />}
         />
+
+        <Route 
+          path="/home/solicitante/:idUsuario/traductores" 
+          element={<TraductoresRegistrados />} 
+        />
+
+        <Route 
+          path="home/traductor/:idUsuario/pedidos-pendientes" 
+          element={<PedidosTraduccion />} 
+        />
+
         <Route path="/home/traductor/:idUsuario/*" element={<UserHome />}>
-          <Route index element={<PedidosTraduccion />} />
+          aqui va algo en la home de traductor
         </Route>
         <Route path="/usuario" element={<UserProfile />} />
         <Route path="/avo-profile" element={<AvoProfile />} />
         <Route path="/preguntas-frecuentes" element={<PreguntasFrecuentes />} />
         <Route path="/family-search" element={<FamilySearch />} />
-        <Route path="/traductores" element={<TraductoresRegistrados />} />
         <Route path="/solicitantes" element={<div>solicitantes</div>} />
-        <Route path="/pedidos-pendientes" element={<PedidosTraduccion />} />
         <Route path="/network-error" element={<div>Error</div>} />
         <Route path="*" element={<ModalConfirmacion />} />
       </Routes>
