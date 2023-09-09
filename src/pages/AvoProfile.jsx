@@ -24,9 +24,8 @@ function AvoProfile() {
   const handleBack = () => navigate(-1);
     const fetchData = async () => {
       try{ 
-          const datosAvo=await tramiteService.traerDatosAvo(1);
+          const datosAvo=await tramiteService.traerDatosAvo(JSON.parse(window.localStorage.getItem('usuarioLogueado')).id);
           setAvoData(datosAvo)
-          console.log(datosAvo.sexo)
           if(datosAvo.sexo === "MASCULINO"){setAvatar("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTujnrocNopBoCYAhK3G50mc6qYWSV4c8h6Gg&usqp=CAU")}
           else{setAvatar("https://img.freepik.com/vector-gratis/plantilla-etiqueta-cara-icono-emoji-anciana_1308-58444.jpg?w=2000")}
     } catch (error) {

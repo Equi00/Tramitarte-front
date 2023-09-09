@@ -3,6 +3,7 @@ import { CalendarIcon } from "@chakra-ui/icons";
 import {
   Box,
   Flex,
+  Button,
   VStack,
   Avatar,
   IconButton,
@@ -12,15 +13,50 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 import { AccountCircle, Close, Edit } from "@mui/icons-material";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import usuarioService from "../services/UsuarioService";
 
 function UserProfile() {
+  const [edit,setEdit]= useState(false)
+  const [editNickname,setEditNickname]= useState()
+  const [userData, setUserData] = useState()
+  
+  const {user}=useAuth0()
   const navigate = useNavigate();
 
   const handleBack = () => navigate(-1);
 
-  const handleEdit = () => console.log("acá");
-  const {user}=useAuth0()
+  const handleEdit = () => {
+    setEdit(true);
+  };
+
+  const handleSave = async () => {
+      let usuarioActualizado = await usuarioService.actualizarNickUsuario(editNickname)
+      setEditNickname(usuarioActualizado.username);
+      setUserData(usuarioActualizado)
+      setEdit(false);
+};
+
+  const handleCancel = () => {
+    setEditNickname(user ? user.name : JSON.parse(window.localStorage.getItem('usuarioLogueado').username));
+    setEdit(false);
+  };
+ 
+  const fetchDataUser = async () => {
+    try{ 
+      console.log(JSON.parse(window.localStorage.getItem('usuarioLogueado')).correoElectronico)
+         const datosUsuario=await usuarioService.traerUsuarioXMail(JSON.parse(window.localStorage.getItem('usuarioLogueado')).correoElectronico);
+        setUserData(datosUsuario)
+  } catch (error) {
+      console.error('Error al obtener datos del Usuario:', error);
+    }
+}
+
+useEffect(() => {
+  fetchDataUser();
+}, []); 
+
 
   return (
     <Box minH="100%" h="100%" p="3%" bg="blue.800">
@@ -43,15 +79,30 @@ function UserProfile() {
               icon={<Edit />}
             />
           </Flex>
-          <Flex py="2%" w="100%" justifyContent="space-around">
+          <Flex py="2%" w="90%" justifyContent="space-evenly" flexWrap="wrap">
             <Avatar
               size="2xl"
               name="Segun Adebayo"
-              src={user ? user.picture : JSON.parse(window.localStorage.getItem('usuarioLogueado').fotoPerfil)}
+              src={userData?.fotoPerfil}
             />
             <Center>
-              <Heading color="blue.900" as="h1" size="xl">
-                {user.nickname}
+             <Heading size="xl"  style={{ fontSize:'14px' }}>
+               {edit? (
+                <input 
+                   type="text"
+                   value={editNickname}
+                   placeholder="ingrese su nuevo Nickname"
+                   onChange={(e) => setEditNickname(e.target.value)}
+                   style={{
+                    background: 'transparent',
+                    borderRadius:"5px",
+                    color: 'white',
+                    minWidth:'195px'
+                  }}
+                 />
+                  ) : (
+                    <Heading size="md">{userData?.username} </Heading>
+               )}
               </Heading>
             </Center>
           </Flex>
@@ -60,16 +111,35 @@ function UserProfile() {
               <Box justifyContent="center" marginRight="2.4rem">
                 <AccountCircle size="lg" />
               </Box>
-              <Heading size="md">{user ? user.name : JSON.parse(window.localStorage.getItem('usuarioLogueado').username)}  </Heading>
+              <Heading size="md"> {userData?.nombre} {userData?.apellido} </Heading>
             </WrapItem>
             <WrapItem p="2.4rem" w="sm">
               <Box justifyContent="center" marginRight="2.4rem">
                 <CalendarIcon />
               </Box>
-              <Heading size="md">{user ? user.birthdate : JSON.parse(window.localStorage.getItem('usuarioLogueado').fechaDeNacimiento)}</Heading>
+              <Heading size="md">{userData?.fechaDeNacimiento}</Heading>
             </WrapItem>
           </Wrap>
-          
+                    {edit? ( <><Flex  w="90%" justifyContent="space-around" >
+                      <Button
+            onClick={() => handleSave()}
+            borderRadius="45px"
+            color="white"
+            w="40%"
+            bg="blue.900"
+            py="2%"
+          >
+            {"Guardar"}
+          </Button>
+             <Button
+             onClick={() => handleCancel()}
+             borderRadius="45px"
+             color="white"
+             w="40%"
+             bg="teal.500"
+                       >
+             {"Cancelar"}
+           </Button></Flex></>):<></>}
         </VStack>
       </Flex>
       {/* <Circle zIndex="-1" size="40px" bg="teal.200" /> */}
