@@ -40,8 +40,9 @@ import {
   Logout,
 } from "@mui/icons-material";
 import { useLocation, useNavigate, useParams } from "react-router";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import usuarioService from "../services/UsuarioService";
 
 const NavLink = ({ texto, link }) => (
   <Link
@@ -65,6 +66,7 @@ export default function UserNavbar({ usuarioLogueado }) {
   const location = useLocation();
   const { idUsuario } = useParams();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [notificaciones, setNotificacion] = useState()
   const bgColors = useColorModeValue("teal.300", "blue.900");
   const colors = useColorModeValue("white", "blue.900");
   const btnRef = useRef();
@@ -76,7 +78,7 @@ export default function UserNavbar({ usuarioLogueado }) {
       icono: <Icon color="white" as={Home} boxSize={8} />,
     },
     {
-      hipervinculo: "/traductores",
+      hipervinculo: `/home/solicitante/${idUsuario}/traductores`,
       texto: "Traductores Registrados",
       icono: (
         <Icon
@@ -113,7 +115,7 @@ export default function UserNavbar({ usuarioLogueado }) {
       icono: <Icon color="white" as={Home} boxSize={8} />,
     },
     {
-      hipervinculo: "/pedidos-pendientes",
+      hipervinculo: `/home/traductor/${idUsuario}/pedidos-pendientes`,
       texto: "Solicitudes pendientes",
       icono: <Icon color="white" as={Assignment} bg="teal.300" boxSize={8} />,
     },
@@ -124,7 +126,24 @@ export default function UserNavbar({ usuarioLogueado }) {
     },
   ];
 
-  const notificaciones = ["Notificación 1", "Notificación 2"];
+  //const notificacionesanashe = ["Notificación 1", "Notificación 2"];
+
+  const notificacionesUsuario = async () => {
+    try{
+      let notificacion = await usuarioService.traerNotificaciones(idUsuario)
+      setNotificacion(notificacion)
+    }catch(e){
+      navigate("/network-error")
+    }
+  }
+
+  const eliminarAlerta = async (idAlerta) => {
+    await usuarioService.eliminarAlerta(idAlerta)
+  }
+
+  useEffect(() =>{
+    notificacionesUsuario() //esto va a estar en loop infinito actualizando las notificaciones
+  }, [notificaciones])
 
   return (
     <>
@@ -163,20 +182,31 @@ export default function UserNavbar({ usuarioLogueado }) {
                   variant="solid"
                   bg="teal.300"
                 >
-                  <TagLeftIcon key={"fal"} boxSize="8" as={Email} />
-                  <TagLabel key={"rem"} ml={"-.4rem"}>
-                    {notificaciones.length}
+                  <TagLeftIcon key={"fal"} boxSize="8" as={Email} color={notificaciones && notificaciones.length > 0 ? "red.500" : "white"} />
+                  <TagLabel key={"rem"} ml={"-.4rem"} color={notificaciones && notificaciones.length > 0 ? "red.500" : "white"} fontSize={20}>
+                    {notificaciones ? notificaciones.length : <div>0</div>}
                   </TagLabel>
                 </Tag>
               </MenuButton>
               <MenuList color={useColorModeValue("blue.900", "white")}>
-                {notificaciones.map((notificacion, index) => (
+                {notificaciones && notificaciones.length === 0 ? <div>No hay notificaciones</div>:notificaciones && notificaciones.map((notificacion, index) => (
                   <>
                     <MenuItem
+                      maxWidth={"17rem"}
+                      display={"flex"}
+                      justifyContent={"space-around"}
                       key={index}
                       _hover={{ bg: 'useColorModeValue("blue.900", "white")' }}
                     >
-                      {notificacion}
+                      <IconButton
+                        color="white"
+                        bg="red.500"
+                        h="5em"
+                        marginRight={"10px"}
+                        onClick={() => eliminarAlerta(notificacion.idNotificacion)}
+                        icon={<CloseIcon />}
+                      />
+                      {notificacion.descripcion}
                     </MenuItem>
                   </>
                 ))}
