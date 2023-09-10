@@ -16,9 +16,8 @@ class UsuarioService {
         return usuario.data
     }
 
-    async actualizarNickUsuario(nick) {
+    async actualizarDataUsuario(body) {
         let usuarioAux = JSON.parse(window.localStorage.getItem('usuarioLogueado'));
-        let body = { "username": nick };
         let id = usuarioAux.id;
         try {
             let usuario = await axios?.post(`${this.urlBackend}/usuario/${id}`, body);

@@ -20,6 +20,8 @@ import usuarioService from "../services/UsuarioService";
 function UserProfile() {
   const [edit,setEdit]= useState(false)
   const [editNickname,setEditNickname]= useState()
+  const [editNombre, setEditNombre]=useState()
+  const [editApellido, setEditApellido]=useState()
   const [userData, setUserData] = useState()
   
   const {user}=useAuth0()
@@ -32,8 +34,15 @@ function UserProfile() {
   };
 
   const handleSave = async () => {
-      let usuarioActualizado = await usuarioService.actualizarNickUsuario(editNickname)
+      let body={
+        "username":editNickname,
+        "apellido":editApellido,
+        "nombre":editNombre
+      }
+      let usuarioActualizado = await usuarioService.actualizarDataUsuario(body)
       setEditNickname(usuarioActualizado.username);
+      setEditNombre(usuarioActualizado.nombre);
+      setEditApellido(usuarioActualizado.apellido)
       setUserData(usuarioActualizado)
       setEdit(false);
 };
@@ -111,7 +120,42 @@ useEffect(() => {
               <Box justifyContent="center" marginRight="2.4rem">
                 <AccountCircle size="lg" />
               </Box>
-              <Heading size="md"> {userData?.nombre} {userData?.apellido} </Heading>
+              <Heading size="xl"  style={{ fontSize:'14px' }}>
+               {edit? (
+                <input 
+                   type="text"
+                   value={editNombre}
+                   placeholder="ingrese su nombre"
+                   onChange={(e) => setEditNombre(e.target.value)}
+                   style={{
+                    background: 'transparent',
+                    borderRadius:"5px",
+                    color: 'white',
+                    minWidth:'195px'
+                  }}
+                 />
+                  ) : (
+                    <Heading size="md">{userData?.nombre} </Heading>
+               )}
+              </Heading>
+              <Heading size="xl"  style={{ fontSize:'14px' }}>
+               {edit? (
+                <input 
+                   type="text"
+                   value={editApellido}
+                   placeholder="ingrese su apellido"
+                   onChange={(e) => setEditApellido(e.target.value)}
+                   style={{
+                    background: 'transparent',
+                    borderRadius:"5px",
+                    color: 'white',
+                    minWidth:'195px'
+                  }}
+                 />
+                  ) : (
+                    <Heading size="md">{userData?.apellido} </Heading>
+               )}
+              </Heading>
             </WrapItem>
             <WrapItem p="2.4rem" w="sm">
               <Box justifyContent="center" marginRight="2.4rem">
