@@ -12,10 +12,8 @@ class UsuarioService {
 
     async traerUsuarioXMail(mail) {
         let body= {"correoElectronico" : mail}
-        console.log(body)
         let usuario= await axios?.get(`${this.urlBackend}/usuario`, { params: body })
-        console.log(usuario)
-        return usuario
+        return usuario.data
     }
 
     async traerTraductores(){
@@ -97,8 +95,21 @@ class UsuarioService {
         console.log("se elimino la solicitud de descarga")
     }
     
+    async actualizarDataUsuario(body) {
+        let usuarioAux = JSON.parse(window.localStorage.getItem('usuarioLogueado'));
+        let id = usuarioAux.id;
+        try {
+            let usuario = await axios?.post(`${this.urlBackend}/usuario/${id}`, body);
+            return usuario.data;
+        } catch (error) {
+            console.error("Error al actualizar el nombre de usuario:", error);
+            throw error;
+        }
+    }
+ 
 }
 
 const usuarioService = new UsuarioService();
 
 export default usuarioService;
+//api/usuario/{id}
