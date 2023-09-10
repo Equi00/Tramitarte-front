@@ -64,13 +64,15 @@ function PedidosTraduccion() {
   }
 
   const enviarNotificacionAceptar = () => {
-    usuarioService.enviarAlerta(idUsuario, solicitudGuardada.solicitante.id, "El usuario "+user.name+" ha aceptado su solicitud")
+    usuarioService.crearPedidoTraduccion(solicitudGuardada.solicitante.id, idUsuario)
+    usuarioService.enviarAlerta(idUsuario, solicitudGuardada.solicitante.id, "El traductor "+user.name+" ha aceptado su solicitud")
+    usuarioService.eliminarSolicitudTraduccion(solicitudGuardada.id)
     cerrarModalConfirmacion()
   }
 
   const enviarNotificacionCancelar = () => {
     usuarioService.eliminarSolicitudTraduccion(solicitudGuardada.id)
-    usuarioService.enviarAlerta(idUsuario, solicitudGuardada.solicitante.id, "El usuario "+user.name+" ha rechazado su solicitud")
+    usuarioService.enviarAlerta(idUsuario, solicitudGuardada.solicitante.id, "El traductor "+user.name+" ha rechazado su solicitud")
     cerrarModalCancelar()
   }
 

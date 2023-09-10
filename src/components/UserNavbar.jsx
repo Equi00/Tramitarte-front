@@ -139,7 +139,6 @@ export default function UserNavbar({ usuarioLogueado }) {
 
   const eliminarAlerta = async (idAlerta) => {
     await usuarioService.eliminarAlerta(idAlerta)
-    console.log("alerta eliminada")
   }
 
   useEffect(() =>{

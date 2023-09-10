@@ -25,6 +25,7 @@ import CardAviso from "../components/CardAviso";
 import ModalConfirmacion from "../components/ModalConfirmacion";
 import { useAuth0 } from "@auth0/auth0-react";
 import ModalError from "../components/ModalError";
+import ModalAdvertencia from "../components/ModalAdvertencia";
 
 function TraductoresRegistrados() {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ function TraductoresRegistrados() {
   const [traductorGuardado, setTraductorGuardado] = useState()
   const [traductores, setTraductores] = useState([]) 
   const { isOpen: isOpenError, onOpen: onOpenError, onClose: onCloseError } = useDisclosure();
+  const { isOpen: isOpenWarning, onOpen: onOpenWarning, onClose: onCloseWarning } = useDisclosure();
   const { idUsuario } = useParams();
   const {user}=useAuth0()
 
@@ -39,10 +41,27 @@ function TraductoresRegistrados() {
     navigate(-1);
   };
 
-  const abrirModal = (traductorEnganchado) => {
-    setTraductorGuardado(traductorEnganchado)
-    setEstaModalAbierto(true);
+  const abrirModal = async (traductorEnganchado) => {
+    // Almacena temporalmente el traductor guardado.
+    const traductorTemp = traductorEnganchado;
+    setTraductorGuardado(traductorTemp);
+  
+    try {
+      const solicitudes = await usuarioService.buscarSolicitudTraduccionSolicitante(idUsuario, traductorTemp.id);
+      const solicitudDeSolicitante = await usuarioService.buscarSolicitudPorSolicitante(idUsuario)
+      
+      if (solicitudes && solicitudes.length > 0) {
+        onOpenError();
+      } else if(solicitudDeSolicitante) {
+        onOpenWarning(true);
+      }else{
+        setEstaModalAbierto(true);
+      }
+    } catch (error) {
+      navigate("/network-error");
+    }
   };
+
 
   const cerrarModal = () => {
     setEstaModalAbierto(false);
@@ -57,22 +76,15 @@ function TraductoresRegistrados() {
     }
   }
 
+  const eliminarAnteriorSolicitud = async () => {
+    await usuarioService.eliminarSolicitudTraduccionPorSolicitante(idUsuario)
+    enviarNotificacionTraductor()
+    onCloseWarning()
+  }
+
   const enviarNotificacionTraductor = async () => {
-    console.log("id de usuario: ", idUsuario);
     try {
-      usuarioService.enviarNotificacion(idUsuario, traductorGuardado.id, "El usuario " + user.name + " requiere de sus servicios");
-      
-      const solicitudes = await usuarioService.buscarSolicitudTraduccionSolicitante(idUsuario);
-      
-      if (solicitudes && solicitudes.length > 0) {
-        const solicitudesConMismoSolicitante = solicitudes.filter(solicitud => solicitud.solicitante.id === idUsuario);
-        
-        if (solicitudesConMismoSolicitante.length > 1) {
-          onOpenError()
-        }
-      }
-  
-      console.log("Notificación enviada");
+      await usuarioService.enviarNotificacion(idUsuario, traductorGuardado.id, "El usuario " + user.name + " requiere de sus servicios");
     } catch (e) {
       navigate("/network-error");
     }
@@ -172,6 +184,17 @@ function TraductoresRegistrados() {
         isOpen={isOpenError}
         onClose={onCloseError}
       />
+      <ModalAdvertencia
+        id="modal-confirmacion"
+        pregunta={"¡ATENCIÓN!"}
+        datoAConfirmar={traductorGuardado && 
+          "Usted ya envio una solicitud de traducción a otro traductor ¿Está seguro de enviar una solicitud a "+traductorGuardado.nombre+"?"}
+        segundoParrafo={"En caso de aceptar, su anterior solicitud se eliminara"}
+        isOpen={isOpenWarning}
+        handleConfirmacion={eliminarAnteriorSolicitud}
+        onClose={onCloseWarning}
+      />
+      
     </Box>
   );
 }

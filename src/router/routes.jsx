@@ -18,6 +18,8 @@ import DocumentacionAscendentes from "../pages/DocumentacionAscendentes";
 import DocumentacionAVO from "../pages/ArchivosAVO";
 import ArchivosAVO from "../pages/ArchivosAVO";
 import AvoProfile from "../pages/AvoProfile";
+import CardAviso from "../components/CardAviso";
+import CardTraduccion from "../components/CardTraduccion";
 
 export const RouterApp = ({ setTramiteContext, setUsuarioLogueadoContext }) => {
   return (
@@ -76,7 +78,10 @@ export const RouterApp = ({ setTramiteContext, setUsuarioLogueadoContext }) => {
         />
 
         <Route path="/home/traductor/:idUsuario/*" element={<UserHome />}>
-          aqui va algo en la home de traductor
+          <Route 
+            index 
+            element={<CardTraduccion/>} 
+          />
         </Route>
         <Route path="/usuario" element={<UserProfile />} />
         <Route path="/avo-profile" element={<AvoProfile />} />
