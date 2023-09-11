@@ -24,7 +24,7 @@ import {
           <ModalHeader>
             {pregunta}
           </ModalHeader>
-          <ModalBody>
+          <ModalBody textAlign={"center"}>
             {datoAConfirmar}
           </ModalBody>
           <ModalFooter justifyContent="center">

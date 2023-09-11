@@ -7,75 +7,103 @@ import ModalError from "../ModalError";
 import ModalIsLoading from "../ModalIsLoading";
 
 function DocumentacionAVO({ agregarDocumentacionAVO, isOpenNO1, onToggle1, isOpenNO2, onToggle2}) {
-  const [nombre1, setNombre1] = useState("certificado defuncion")
-  const [nombre2, setNombre2] = useState("certificado matrimonio")
-  const [nombre3, setNombre3] = useState("certificado nacimiento")
+  const [nombre1, setNombre1] = useState("certificado defuncion (.pdf)")
+  const [nombre2, setNombre2] = useState("certificado matrimonio (.pdf)")
+  const [nombre3, setNombre3] = useState("certificado nacimiento (.pdf)")
   const [estaCargando, setEstaCargando] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isOpenError, onOpen: onOpenError, onClose: onCloseError } = useDisclosure();
 
   const handleInputCertificadoDefuncion = async (e) => {
     let archivo = e.target.files[0]
-    setEstaCargando(true)
-    let verificacion = await tramiteService.esCertificado(archivo)
-    if(verificacion === false){
-      setEstaCargando(false)
-      onOpen()
+    if(archivo){
+      const ultimoPunto = archivo.name.lastIndexOf(".");
+      const extension = archivo.name.slice(ultimoPunto + 1);
+      setEstaCargando(true)
+      if(extension === "pdf"){
+        let verificacion = await tramiteService.esCertificadoDefuncion(archivo)
+        if(verificacion === false){
+          setEstaCargando(false)
+          onOpen()
+        }else{
+        agregarDocumentacionAVO({
+          id: "certificado-defuncion",
+          archivo: archivo,
+        });
+        const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
+        setNombre1(nombreRecortado)
+        setEstaCargando(false)
+        }
     }else{
-    agregarDocumentacionAVO({
-      id: "certificado-defuncion",
-      archivo: archivo,
-    });
-    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
-    setNombre1(nombreRecortado)
-  }
-  setEstaCargando(false)
+      setEstaCargando(false)
+      onOpenError()
+    }
+    }
   };
 
   const handleInputCertificadoMatrimonio = async (e) => {
     let archivo = e.target.files[0]
-    setEstaCargando(true)
-    let verificacion = await tramiteService.esCertificadoMatrimonio(archivo)
-    if(verificacion === false){
-      setEstaCargando(false)
-      onOpen()
+    if(archivo){
+      const ultimoPunto = archivo.name.lastIndexOf(".");
+      const extension = archivo.name.slice(ultimoPunto + 1);
+      setEstaCargando(true)
+      if(extension === "pdf"){
+        let verificacion = await tramiteService.esCertificadoMatrimonio(archivo)
+        if(verificacion === false){
+          setEstaCargando(false)
+          onOpen()
+        }else{
+        agregarDocumentacionAVO({
+          id: "certificado-matrimonio",
+          archivo: archivo,
+        });
+        const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
+        setNombre2(nombreRecortado)
+        setEstaCargando(false)
+      }
     }else{
-    agregarDocumentacionAVO({
-      id: "certificado-matrimonio",
-      archivo: archivo,
-    });
-    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
-    setNombre2(nombreRecortado)
-  }
-  setEstaCargando(false)
+      setEstaCargando(false)
+      onOpenError()
+    }
+    }
   };
 
   const handleInputCertificadoNacimiento = async (e) => {
     let archivo = e.target.files[0]
-    setEstaCargando(true)
-    let verificacion = await tramiteService.esCertificadoNacimiento(archivo)
-    if(verificacion === false){
-      setEstaCargando(false)
-      onOpen()
+    if(archivo){
+      const ultimoPunto = archivo.name.lastIndexOf(".");
+      const extension = archivo.name.slice(ultimoPunto + 1);
+      setEstaCargando(true)
+        if(extension === "pdf"){
+        let verificacion = await tramiteService.esCertificadoNacimiento(archivo)
+        if(verificacion === false){
+          setEstaCargando(false)
+          onOpen()
+        }else{
+        agregarDocumentacionAVO({
+          id: "certificado-nacimiento",
+          archivo: archivo,
+        });
+        const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
+        setNombre3(nombreRecortado)
+        setEstaCargando(false)
+        }
     }else{
-    agregarDocumentacionAVO({
-      id: "certificado-nacimiento",
-      archivo: archivo,
-    });
-    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
-    setNombre3(nombreRecortado)
-  }
-  setEstaCargando(false)
+      setEstaCargando(false)
+      onOpenError()
+    }
+    }
   };
 
   useEffect(() => {
     if(isOpenNO1 === false){
-      setNombre1("certificado defuncion")
+      setNombre1("certificado defuncion (.pdf)")
     }
   }, [isOpenNO1])
 
   useEffect(() => {
     if(isOpenNO2 === false){
-      setNombre2("certificado matrimonio")
+      setNombre2("certificado matrimonio (.pdf)")
     }
   }, [isOpenNO2])
 
@@ -110,6 +138,14 @@ function DocumentacionAVO({ agregarDocumentacionAVO, isOpenNO1, onToggle1, isOpe
         mensaje={"Esperanos mientras guardamos la documentación ;)"}
         isOpen={estaCargando}
       />
+      <ModalError
+                pregunta={"La extension del archivo no es valida"}
+                datoAConfirmar={
+                "Por favor elija un archivo de extension ¨.pdf¨."
+                }
+                isOpen={isOpenError}
+                onClose={onCloseError}
+            />
     </Box>
   );
 }
