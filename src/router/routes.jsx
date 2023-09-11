@@ -18,6 +18,7 @@ import DocumentacionAscendentes from "../pages/DocumentacionAscendentes";
 import DocumentacionAVO from "../pages/ArchivosAVO";
 import ArchivosAVO from "../pages/ArchivosAVO";
 import AvoProfile from "../pages/AvoProfile";
+import DocumentacionCargada from "../pages/DocumentacionCargada";
 
 export const RouterApp = ({ setTramiteContext, setUsuarioLogueadoContext }) => {
   return (
@@ -74,7 +75,9 @@ export const RouterApp = ({ setTramiteContext, setUsuarioLogueadoContext }) => {
         <Route path="/traductores" element={<TraductoresRegistrados />} />
         <Route path="/solicitantes" element={<div>solicitantes</div>} />
         <Route path="/pedidos-pendientes" element={<PedidosTraduccion />} />
+        <Route path="/documentacion-cargada" element={<DocumentacionCargada />} />
         <Route path="/network-error" element={<div>Error</div>} />
+        
         <Route path="*" element={<ModalConfirmacion />} />
       </Routes>
     </BrowserRouter>
