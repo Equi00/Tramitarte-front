@@ -48,13 +48,11 @@ function ArchivosAVO() {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(archivo);
-  
+
       reader.onloadend = () => {
-        const base64File = reader.result.split(",")[1];
-  
-        resolve(base64File);
+        resolve(reader.result);
       };
-  
+
       reader.onerror = (error) => {
         reject(error);
       };

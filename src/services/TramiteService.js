@@ -96,6 +96,30 @@ class TramiteService {
     return response.data;
   }
 
+  async esCertificadoNacimientoItaliano(pdfFile){
+    const formData = new FormData();
+    formData.append("pdf", pdfFile);
+
+    const response = await axios.post(`${this.urlBackend}/ocr/pdf/is_birth_italy`, formData);
+    return response.data;
+  }
+
+  async esCertificadoMatrimonioItaliano(pdfFile) {
+    const formData = new FormData();
+    formData.append("pdf", pdfFile);
+  
+    const response = await axios.post(`${this.urlBackend}/ocr/pdf/is_marriage_italy`, formData);
+    return response.data;
+  }
+
+  async esCertificadoDefuncionItaliano(pdfFile) {
+    const formData = new FormData();
+    formData.append("pdf", pdfFile);
+  
+    const response = await axios.post(`${this.urlBackend}/ocr/pdf/is_death_italy`, formData);
+    return response.data;
+  }
+
   async eliminar(idTramite) {
     await axios.delete(`${this.urlBackend}/tramite/${idTramite}`);
   }
@@ -103,7 +127,7 @@ class TramiteService {
   async traerDatosAvo(idUsuario){
     let avo= await axios?.get(`${this.urlBackend}/solicitud/usuario/${idUsuario}`)
     return avo.data
-}
+  }
 }
 
 const tramiteService = new TramiteService();

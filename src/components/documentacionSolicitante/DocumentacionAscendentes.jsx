@@ -13,38 +13,52 @@ function DocumentacionAscendentesArchivo({ cantidadAscendentes, personas, setDoc
   const [nombre3, setNombre3] = useState([]);
   const [estaCargando, setEstaCargando] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isOpenError, onOpen: onOpenError, onClose: onCloseError } = useDisclosure();
   const [verificado1, setVerificado1] = useState([])
   const [verificado2, setVerificado2] = useState([])
 
   const handleInputCertificadoDefuncion = async (e, index) => {
     const archivo = e.target.files[0];
-    setEstaCargando(true)
-    const verificacion = await tramiteService.esCertificado(archivo);
+    if(archivo){
+      const ultimoPunto = archivo.name.lastIndexOf(".");
+      const extension = archivo.name.slice(ultimoPunto + 1);
+      setEstaCargando(true)
+    if(extension === "pdf"){
+    const verificacion = await tramiteService.esCertificadoDefuncion(archivo);
     
     if (verificacion === false) {
-      setEstaCargando(false)
-      onOpen();
-    } else {
-      setDocumentacionAncestros({
-        id: "certificado-defuncion",
-        archivo: archivo,
-        index: index
-      });
+        setEstaCargando(false)
+        onOpen();
+      } else {
+        setDocumentacionAncestros({
+          id: "certificado-defuncion",
+          archivo: archivo,
+          index: index
+        });
 
-      const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
-      
-      setNombre1((prevNombres) => {
-        const nuevosNombres = [...prevNombres];
-        nuevosNombres[index] = nombreRecortado;
-        return nuevosNombres;
-      });
-    }
+        const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
+        
+        setNombre1((prevNombres) => {
+          const nuevosNombres = [...prevNombres];
+          nuevosNombres[index] = nombreRecortado;
+          return nuevosNombres;
+        });
+        setEstaCargando(false)
+      }
+  }else{
     setEstaCargando(false)
+    onOpenError()
   }
+    }
+}
 
   const handleInputCertificadoMatrimonio = async (e, index) => {
     const archivo = e.target.files[0];
-    setEstaCargando(true)
+    if(archivo){
+      const ultimoPunto = archivo.name.lastIndexOf(".");
+      const extension = archivo.name.slice(ultimoPunto + 1);
+      setEstaCargando(true)
+      if(extension === "pdf"){
     const verificacion = await tramiteService.esCertificadoMatrimonio(archivo);
     
     if (verificacion === false) {
@@ -64,13 +78,22 @@ function DocumentacionAscendentesArchivo({ cantidadAscendentes, personas, setDoc
         nuevosNombres[index] = nombreRecortado;
         return nuevosNombres;
       });
+      setEstaCargando(false)
     }
+  }else{
     setEstaCargando(false)
+    onOpenError()
+  }
+    }
   }
 
   const handleInputCertificadoNacimiento = async (e, index) => {
     const archivo = e.target.files[0];
-    setEstaCargando(true)
+    if(archivo){
+      const ultimoPunto = archivo.name.lastIndexOf(".");
+      const extension = archivo.name.slice(ultimoPunto + 1);
+      setEstaCargando(true)
+      if(extension === "pdf"){
     const verificacion = await tramiteService.esCertificadoNacimiento(archivo);
     
     if (verificacion === false) {
@@ -90,14 +113,19 @@ function DocumentacionAscendentesArchivo({ cantidadAscendentes, personas, setDoc
         nuevosNombres[index] = nombreRecortado;
         return nuevosNombres;
       });
+      setEstaCargando(false)
     }
+  }else{
     setEstaCargando(false)
+    onOpenError()
+  }
+    }
   }
 
   useEffect(() => { //seteo todos los valores standar segun la cantidad de descendientes
-    const nombres1 = Array(cantidadAscendentes).fill("certificado defuncion");
-    const nombres2 = Array(cantidadAscendentes).fill("certificado matrimonio");
-    const nombres3 = Array(cantidadAscendentes).fill("certificado nacimiento");
+    const nombres1 = Array(cantidadAscendentes).fill("certificado defuncion (.pdf)");
+    const nombres2 = Array(cantidadAscendentes).fill("certificado matrimonio (.pdf)");
+    const nombres3 = Array(cantidadAscendentes).fill("certificado nacimiento (.pdf)");
     const cantidadVerificados = Array(cantidadAscendentes).fill(false)
   
     setNombre1(nombres1);
@@ -113,7 +141,7 @@ function DocumentacionAscendentesArchivo({ cantidadAscendentes, personas, setDoc
       if (verificado1[index] === false) {
         setNombre1((prevNombres) => {
           const nuevosNombres = [...prevNombres];
-          nuevosNombres[index] = "certificado defuncion";
+          nuevosNombres[index] = "certificado defuncion (.pdf)";
           return nuevosNombres;
         });
         if(!(personas[index].certificadoDefuncion.nombre === "")){
@@ -132,7 +160,7 @@ function DocumentacionAscendentesArchivo({ cantidadAscendentes, personas, setDoc
       if (verificado2[index] === false) {
         setNombre2((prevNombres) => {
           const nuevosNombres = [...prevNombres];
-          nuevosNombres[index] = "certificado matrimonio";
+          nuevosNombres[index] = "certificado matrimonio (.pdf)";
           return nuevosNombres;
         });
         if(!(personas[index].certificadoMatrimonio.nombre === "")){
@@ -181,6 +209,14 @@ function DocumentacionAscendentesArchivo({ cantidadAscendentes, personas, setDoc
         isOpen={isOpen}
         onClose={onClose}
       />
+      <ModalError
+                pregunta={"La extension del archivo no es valida"}
+                datoAConfirmar={
+                "Por favor elija un archivo de extension ¨.pdf¨."
+                }
+                isOpen={isOpenError}
+                onClose={onCloseError}
+            />
       <ModalIsLoading
         mensaje={"Esperanos mientras guardamos la documentación ;)"}
         isOpen={estaCargando}

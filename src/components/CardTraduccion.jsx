@@ -11,6 +11,7 @@ import {
     Grid,
     HStack,
     IconButton,
+    Input,
   } from "@chakra-ui/react";
   
   import ModalConfirmacion from "./ModalConfirmacion";
@@ -22,6 +23,9 @@ import CardAviso from "./CardAviso";
 import { Close, Delete } from "@mui/icons-material";
 import usuarioService from "../services/UsuarioService";
 import { useAuth0 } from "@auth0/auth0-react";
+import { saveAs } from "file-saver";
+import JSZip from "jszip";
+var zip = require("jszip")()
   
   function CardTraduccion() {
     const { idUsuario } = useParams();
@@ -29,18 +33,19 @@ import { useAuth0 } from "@auth0/auth0-react";
     const [pedidos, setPedidos] = useState([])
     const [pedidoGuardado, setPedidoGuardado] = useState()
     const [estaEliminarAbierto, setEstaEliminarAbierto] = useState(false);
-    const [estaAceptarAbierto, setEstaAceptarAbierto] = useState(false);
+    const [estaDescargarAbierto, setEstaDescargarAbierto] = useState(false);
     const {user}=useAuth0()
+    const [files, setFiles] = useState([])
+    
+      const cerrarModalDescargar = () => {
+        setEstaDescargarAbierto(false);
+      };
 
-    const abrirModalEnviar = (pedidoEnganchado) => {
+      const abrirModalDescargar = (pedidoEnganchado) => {
         let pedido = pedidoEnganchado
         setPedidoGuardado(pedido)
         console.log("pedido enganchado: ",pedidoEnganchado.tramite.usuario.nombre)
-        setEstaAceptarAbierto(true);
-      };
-    
-      const cerrarModalEnviar = () => {
-        setEstaAceptarAbierto(false);
+        setEstaDescargarAbierto(true);
       };
     
     const abrirModalCancelar = (pedidoEnganchado) => {
@@ -69,12 +74,50 @@ import { useAuth0 } from "@auth0/auth0-react";
         cerrarModalCancelar()
       }
 
-    const enviarSolicitudDescarga = async () => {
-        await usuarioService.crearSolicitudDescarga(pedidoGuardado.tramite.usuario.id, idUsuario)
-        console.log("se envio")
-        await usuarioService.eliminarPedidoTraduccion(pedidoGuardado.id)
-        await usuarioService.enviarAlerta(idUsuario, pedidoGuardado.tramite.usuario.id, "El traductor "+user.name+" ha enviado los documentos traducidos")
-        setEstaAceptarAbierto(false);
+    const descargarArchivos = async () => {
+      const arrayArchivos = pedidoGuardado.tramite.adjuntosATraducir;
+      console.log(arrayArchivos)
+      const zip = new JSZip();
+    
+      // Itera sobre los archivos en formato Base64 y agrégalos al ZIP
+      arrayArchivos.forEach((archivo, index) => { // Agrega un índice
+        const nombreArchivo = `${archivo.nombre.replace(/\s/g, '_')}_${index}.pdf`; // Añade el índice al nombre
+        const base64Data = archivo.archivoBase64;
+    
+        // Decodifica el Base64 en un Blob
+        const archivoBlob = base64ToBlob(base64Data);
+    
+        // Agrega el archivo al ZIP
+        zip.file(nombreArchivo, archivoBlob);
+      });
+    
+      // Genera el archivo ZIP
+      zip.generateAsync({ type: "blob" }).then((content) => {
+        saveAs(content, "Documentación-traducida.zip");
+      });
+    
+      cerrarModalDescargar();
+    };
+
+    function base64ToBlob(base64Data) {
+      const splitData = base64Data.split(",");
+      const contentType = splitData[0].match(/:(.*?);/)[1];
+      const byteCharacters = atob(splitData[1]);
+      const byteNumbers = new Array(byteCharacters.length);
+    
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+    
+      const byteArray = new Uint8Array(byteNumbers);
+      return new Blob([byteArray], { type: contentType });
+    }
+
+    const cargarDocumento = (pedido) => {
+      localStorage.setItem('idTraductor', JSON.stringify(idUsuario));
+      localStorage.setItem('idSolicitante', JSON.stringify(pedido.tramite.usuario.id));
+      localStorage.setItem('idPedido', JSON.stringify(pedido.id));
+      navigate(`/carga`)
     }
 
     useEffect(() => {
@@ -90,9 +133,9 @@ import { useAuth0 } from "@auth0/auth0-react";
           borderRadius="45px"
           bg="rgba(255, 255, 255, 0.8)"
           align="center"
-          p="1.6rem"
+          p={"1rem"}
           w={"20rem"}
-          marginBottom={"1rem"}
+          marginBottom={"0.5rem"}
         >
             <HStack spacing="2%" justifyContent={"right"} width={"100%"}>
                 <IconButton
@@ -108,24 +151,26 @@ import { useAuth0 } from "@auth0/auth0-react";
             <Heading textAlign="center" size="md">{"Solicitud de traducción"}</Heading>
           </CardHeader>
           <CardBody align="center">
-            <Text>{"Correo del solicitante: "+pedido.tramite.usuario.nombre}</Text>
+            <Text>{"Correo del solicitante: "}<Text fontWeight={700}>{pedido.tramite.usuario.nombre}</Text></Text>
+            <Text>{"Adjuntos a traducir: "+pedido.tramite.adjuntosATraducir.length}</Text>
           </CardBody>
-          <CardFooter w="20rem" justifyContent={"space-between"}>
+          <CardFooter w="20rem" justifyContent={"center"}>
             <Button
-              onClick={() => abrirModalEnviar(pedido)}
               borderRadius="45px"
               color="white"
               w="6rem"
-              bg="green.500"
+              bg="green.400"
+              onClick={() => cargarDocumento(pedido)}
             >
-              {"Enviar"}
+              {"Cargar"}
             </Button>
-
             <Button
               borderRadius="45px"
               color="white"
               w="6rem"
               bg="red.900"
+              marginLeft={"10px"}
+              onClick={() => abrirModalDescargar(pedido)}
             >
               {"Descargar"}
             </Button>
@@ -141,10 +186,10 @@ import { useAuth0 } from "@auth0/auth0-react";
       />
       <ModalConfirmacion
               id="modal-confirmacion"
-              pregunta={pedidoGuardado && "¿Estás seguro de enviar el pedido de "+pedidoGuardado.tramite.usuario.nombre+"?"}
-              isOpen={estaAceptarAbierto}
-              handleConfirmacion={enviarSolicitudDescarga}
-              onClose={cerrarModalEnviar}
+              pregunta={pedidoGuardado && "¿Estás seguro de descargar los documentos de "+pedidoGuardado.tramite.usuario.nombre+"?"}
+              isOpen={estaDescargarAbierto}
+              handleConfirmacion={descargarArchivos}
+              onClose={cerrarModalDescargar}
       />
       </Grid>
     );
