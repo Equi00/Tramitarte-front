@@ -118,12 +118,7 @@ export default function UserNavbar({ usuarioLogueado }) {
       hipervinculo: `/home/traductor/${idUsuario}/pedidos-pendientes`,
       texto: "Solicitudes pendientes",
       icono: <Icon color="white" as={Assignment} bg="teal.300" boxSize={8} />,
-    },
-    {
-      hipervinculo: "/solicitantes",
-      texto: "Solicitantes de traducción",
-      icono: <Icon color="white" as={AssignmentInd} boxSize={8} />,
-    },
+    }
   ];
 
   //const notificacionesanashe = ["Notificación 1", "Notificación 2"];

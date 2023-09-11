@@ -13,7 +13,7 @@ class UsuarioService {
     async traerUsuarioXMail(mail) {
         let body= {"correoElectronico" : mail}
         let usuario= await axios?.get(`${this.urlBackend}/usuario`, { params: body })
-        return usuario.data
+        return usuario
     }
 
     async traerTraductores(){
@@ -81,8 +81,13 @@ class UsuarioService {
         await axios.delete(`${this.urlBackend}/pedido/${idPedido}`)
     }
 
-    async crearSolicitudDescarga(idSolicitante, idTraductor){
-        await axios.post(`${this.urlBackend}/solicitud-descarga/solicitante/${idSolicitante}/traductor/${idTraductor}`)
+    async crearSolicitudDescarga(idSolicitante, idTraductor, documentos){
+        let response = await axios.post(
+            `${this.urlBackend}/solicitud-descarga/solicitante/${idSolicitante}/traductor/${idTraductor}`,
+                    JSON.stringify(documentos),
+                { headers: { "Content-Type": "application/json" } })
+        console.log(response.data)
+        return response
     }
 
     async buscarSolicitudDescargaPorSolicitante(idSolicitante){

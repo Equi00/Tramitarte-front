@@ -8,64 +8,94 @@ import ModalIsLoading from "../ModalIsLoading";
 function DocumentacionSolicitante({
   agregarDocumentacionSolicitante,
 }) {
-  const [nombre1, setNombre1] = useState("dni frente")
-  const [nombre2, setNombre2] = useState("dni dorso")
-  const [nombre3, setNombre3] = useState("certificado de nacimiento")
+  const [nombre1, setNombre1] = useState("dni frente (.jpg)")
+  const [nombre2, setNombre2] = useState("dni dorso (.jpg)")
+  const [nombre3, setNombre3] = useState("certificado de nacimiento (.pdf)")
   const [estaCargando, setEstaCargando] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isOpenError, onOpen: onOpenError, onClose: onCloseError } = useDisclosure();
+  const { isOpen: isOpenError2, onOpen: onOpenError2, onClose: onCloseError2 } = useDisclosure();
 
   const handleInputDniFrente = async (e) => {
     let archivo = e.target.files[0]
-    setEstaCargando(true)
-    let verificacion = await tramiteService.esDniFrente(archivo)
-    if(verificacion === false){
-      setEstaCargando(false)
-      onOpen()
-    }else{
-    agregarDocumentacionSolicitante({
-      id: "dni-frente",
-      archivo: archivo,
-    });
-    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
-    setNombre1(nombreRecortado)
+    if(archivo){
+      const ultimoPunto = archivo.name.lastIndexOf(".");
+      const extension = archivo.name.slice(ultimoPunto + 1);
+      setEstaCargando(true)
+      if(extension === "jpg"){
+        let verificacion = await tramiteService.esDniFrente(archivo)
+        if(verificacion === false){
+          setEstaCargando(false)
+          onOpen()
+        }else{
+        agregarDocumentacionSolicitante({
+          id: "dni-frente",
+          archivo: archivo,
+        });
+        const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
+        setNombre1(nombreRecortado)
+        setEstaCargando(false)
+        }
+      }else{
+        setEstaCargando(false)
+        onOpenError()
+      }
     }
-    setEstaCargando(false)
   };
 
   const handleInputDniDorso = async (e) => {
     let archivo = e.target.files[0]
-    setEstaCargando(true)
-    let verificacion = await tramiteService.esDniDorso(archivo)
-    if(verificacion === false){
-      setEstaCargando(false)
-      onOpen()
-    }else{
-    agregarDocumentacionSolicitante({
-      id: "dni-dorso",
-      archivo: archivo,
-    });
-    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
-    setNombre2(nombreRecortado)
+    if(archivo){
+      const ultimoPunto = archivo.name.lastIndexOf(".");
+      const extension = archivo.name.slice(ultimoPunto + 1);
+      setEstaCargando(true)
+      if(extension === "jpg"){
+        let verificacion = await tramiteService.esDniDorso(archivo)
+        if(verificacion === false){
+          setEstaCargando(false)
+          onOpen()
+        }else{
+        agregarDocumentacionSolicitante({
+          id: "dni-dorso",
+          archivo: archivo,
+        });
+        const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
+        setNombre2(nombreRecortado)
+        setEstaCargando(false)
+        }
+      }else{
+        setEstaCargando(false)
+        onOpenError()
+      }
     }
-    setEstaCargando(false)
+    
   };
 
   const handleInputCertificadoNacimiento = async (e) => {
     let archivo = e.target.files[0]
-    setEstaCargando(true)
-    let verificacion = await tramiteService.esCertificadoNacimiento(archivo)
-    if(verificacion === false){
-      setEstaCargando(false)
-      onOpen()
-    }else{
-    agregarDocumentacionSolicitante({
-      id: "certificado-nacimiento",
-      archivo: archivo,
-    });
-    const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
-    setNombre3(nombreRecortado)
+    if(archivo){
+      const ultimoPunto = archivo.name.lastIndexOf(".");
+      const extension = archivo.name.slice(ultimoPunto + 1);
+      setEstaCargando(true)
+      if(extension === "pdf"){
+        let verificacion = await tramiteService.esCertificadoNacimiento(archivo)
+        if(verificacion === false){
+          setEstaCargando(false)
+          onOpen()
+        }else{
+        agregarDocumentacionSolicitante({
+          id: "certificado-nacimiento",
+          archivo: archivo,
+        });
+        const nombreRecortado = archivo.name.length > 20 ? archivo.name.substring(0, 30) + '...' : archivo.name;
+        setNombre3(nombreRecortado)
+        setEstaCargando(false)
+        }
+      }else{
+        setEstaCargando(false)
+        onOpenError2()
+      }
     }
-    setEstaCargando(false)
   };
 
   return (
@@ -87,6 +117,22 @@ function DocumentacionSolicitante({
         mensaje={"Esperanos mientras guardamos la documentación ;)"}
         isOpen={estaCargando}
       />
+      <ModalError
+                pregunta={"La extension del archivo no es valida"}
+                datoAConfirmar={
+                "Por favor elija un archivo de extension ¨.jpg¨."
+                }
+                isOpen={isOpenError}
+                onClose={onCloseError}
+            />
+      <ModalError
+                pregunta={"La extension del archivo no es valida"}
+                datoAConfirmar={
+                "Por favor elija un archivo de extension ¨.pdf¨."
+                }
+                isOpen={isOpenError2}
+                onClose={onCloseError2}
+            />
     </Box>
   );
 }

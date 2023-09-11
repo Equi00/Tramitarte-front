@@ -26,6 +26,7 @@ import ModalConfirmacion from "../components/ModalConfirmacion";
 import { useAuth0 } from "@auth0/auth0-react";
 import ModalError from "../components/ModalError";
 import ModalAdvertencia from "../components/ModalAdvertencia";
+import tramiteService from "../services/TramiteService";
 
 function TraductoresRegistrados() {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ function TraductoresRegistrados() {
   const [traductorGuardado, setTraductorGuardado] = useState()
   const [traductores, setTraductores] = useState([]) 
   const { isOpen: isOpenError, onOpen: onOpenError, onClose: onCloseError } = useDisclosure();
+  const { isOpen: isOpenError2, onOpen: onOpenError2, onClose: onCloseError2 } = useDisclosure();
   const { isOpen: isOpenWarning, onOpen: onOpenWarning, onClose: onCloseWarning } = useDisclosure();
   const { idUsuario } = useParams();
   const {user}=useAuth0()
@@ -45,17 +47,22 @@ function TraductoresRegistrados() {
     // Almacena temporalmente el traductor guardado.
     const traductorTemp = traductorEnganchado;
     setTraductorGuardado(traductorTemp);
-  
     try {
+      let tramite = await tramiteService.buscarPorUsuario(idUsuario)
+      
       const solicitudes = await usuarioService.buscarSolicitudTraduccionSolicitante(idUsuario, traductorTemp.id);
       const solicitudDeSolicitante = await usuarioService.buscarSolicitudPorSolicitante(idUsuario)
       
-      if (solicitudes && solicitudes.length > 0) {
-        onOpenError();
-      } else if(solicitudDeSolicitante) {
-        onOpenWarning(true);
+      if(tramite && tramite.data.etapa.descripcion === "Cargar documentación traducida"){
+        if (solicitudes && solicitudes.length > 0) {
+          onOpenError();
+        } else if(solicitudDeSolicitante) {
+          onOpenWarning(true);
+        }else{
+          setEstaModalAbierto(true);
+        }
       }else{
-        setEstaModalAbierto(true);
+        onOpenError2()
       }
     } catch (error) {
       navigate("/network-error");
@@ -183,6 +190,14 @@ function TraductoresRegistrados() {
         }
         isOpen={isOpenError}
         onClose={onCloseError}
+      />
+      <ModalError
+        pregunta={"Todavía no tiene permitido pedir un servicio de traducción"}
+        datoAConfirmar={
+          "Por favor cargue todos los certificados antes de enviar una solicitud de traducción"
+        }
+        isOpen={isOpenError2}
+        onClose={onCloseError2}
       />
       <ModalAdvertencia
         id="modal-confirmacion"

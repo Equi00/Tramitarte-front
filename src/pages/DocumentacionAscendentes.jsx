@@ -143,6 +143,8 @@ function DocumentacionAscendentes() {
       let respuesta = await tramiteService.cargarDocumentacionAncestros(documentos, Number(tramite.id));
       console.log(documentos)
       console.log(respuesta);
+      let nombres = documentos.map((docu) => docu.nombre)
+      console.log("nombres de documentos", nombres)
       setEstaCargando(false);
       navigate(
         `/home/solicitante/${
@@ -158,13 +160,11 @@ function DocumentacionAscendentes() {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(archivo);
-  
+
       reader.onloadend = () => {
-        const base64File = reader.result.split(",")[1];
-  
-        resolve(base64File);
+        resolve(reader.result);
       };
-  
+
       reader.onerror = (error) => {
         reject(error);
       };
