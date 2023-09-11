@@ -21,6 +21,7 @@ import AvoProfile from "../pages/AvoProfile";
 import CardAviso from "../components/CardAviso";
 import CardTraduccion from "../components/CardTraduccion";
 import CargaDocumentos from "../components/CargaDocumentos";
+import DocumentacionTraducida from "../pages/DocumentacionTraducida";
 
 export const RouterApp = ({ setTramiteContext, setUsuarioLogueadoContext }) => {
   return (
@@ -58,6 +59,10 @@ export const RouterApp = ({ setTramiteContext, setUsuarioLogueadoContext }) => {
         <Route
           path="/home/solicitante/:idUsuario/documentacion-ascendentes"
           element={<DocumentacionAscendentes />}
+        />
+        <Route
+          path="/home/solicitante/:idUsuario/documentacion-traducida"
+          element={<DocumentacionTraducida />}
         />
         <Route
           path="/home/solicitante/:idUsuario/documentacion-avo"

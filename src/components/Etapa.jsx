@@ -58,7 +58,15 @@ function Etapa({ tramite }) {
   const [pedidoGuardado, setPedidoGuardado] = useState()
   const [estaEliminarAbierto, setEstaEliminarAbierto] = useState(false);
   const [estaAceptarAbierto, setEstaAceptarAbierto] = useState(false);
-  const [files, setFiles] = useState([])
+  const [estaDescargaAbierto, setEstaDescargaAbierto] = useState(false);
+
+  const abrirModalDescarga = () => {
+    setEstaDescargaAbierto(true);
+  };
+
+  const cerrarModalDescarga = () => {
+    setEstaDescargaAbierto(false);
+  };
 
   const abrirModalEnviar = (pedidoEnganchado) => {
     let pedido = pedidoEnganchado
@@ -144,6 +152,45 @@ const abrirModalCancelar = (pedidoEnganchado) => {
     return new Blob([byteArray], { type: contentType });
   }
 
+  const descargarTodoSolicitante = async () => {
+    setEstaCargando(true)
+    let tramite = await tramiteService.buscarPorUsuario(idUsuario)
+    const todasLasListas = tramite.data.documentacionUsuario.concat(
+      tramite.data.documentacionAVO,
+      tramite.data.documentacionDescendientes,
+      tramite.data.documentacionTraducida
+    );
+    const arrayArchivos = todasLasListas;
+    console.log(arrayArchivos)
+    const zip = new JSZip();
+  
+    // Itera sobre los archivos en formato Base64 y agrégalos al ZIP
+    arrayArchivos.forEach((archivo, index) => { // Agrega un índice
+      let ultimoPunto = archivo.nombre.lastIndexOf(".");
+      let extension = archivo.nombre.slice(ultimoPunto + 1);
+      let nombreArchivo = ""
+      if(extension === "jpg"){
+        nombreArchivo = `${archivo.nombre.replace(/\s/g, '_')}_${index}.jpg`; // Añade el índice al nombre
+      }else{
+        nombreArchivo = `${archivo.nombre.replace(/\s/g, '_')}_${index}.pdf`; // Añade el índice al nombre
+      }
+      const base64Data = archivo.archivoBase64;
+  
+      // Decodifica el Base64 en un Blob
+      const archivoBlob = base64ToBlob(base64Data);
+  
+      // Agrega el archivo al ZIP
+      zip.file(nombreArchivo, archivoBlob);
+    });
+  
+    // Genera el archivo ZIP
+    zip.generateAsync({ type: "blob" }).then((content) => {
+      saveAs(content, "Documentación-traducida.zip");
+    });
+    cerrarModalDescarga();
+    setEstaCargando(false)
+  }
+
   useEffect(() => {
     traerSolicitudDescarga()
   }, [pedidos])
@@ -189,6 +236,9 @@ const abrirModalCancelar = (pedidoEnganchado) => {
       case "CARGAR DOCUMENTACIÓN TRADUCIDA":
         porcentaje = "90";
         break;
+      case "HA TERMINADO EL TRAMITE, HAGA CLICK PARA DESCARGAR LOS ARCHIVOS":
+        porcentaje = "100";
+        break;
     }
     return porcentaje;
   }
@@ -224,7 +274,7 @@ const abrirModalCancelar = (pedidoEnganchado) => {
         </CardBody>
         <CardFooter w="100%">
           <Button
-            onClick={() => {
+            onClick={() => {tramite.etapa.descripcion === "Ha terminado el tramite, haga click para descargar los archivos" ? abrirModalDescarga() :
               navigate(elegirRuta(tramite.etapa.descripcion));
             }}
             textTransform="uppercase"
@@ -294,8 +344,15 @@ const abrirModalCancelar = (pedidoEnganchado) => {
               id="modal-confirmacion"
               pregunta={"¿Estás seguro de descargar los documentos?"}
               isOpen={estaAceptarAbierto}
-              handleConfirmacion={descargarArchivos} //falta logica de descarga
+              handleConfirmacion={descargarArchivos} 
               onClose={cerrarModalEnviar}
+      />
+      <ModalConfirmacion
+              id="modal-confirmacion"
+              pregunta={"¿Estás seguro de descargar los documentos?"}
+              isOpen={estaDescargaAbierto}
+              handleConfirmacion={descargarTodoSolicitante} 
+              onClose={cerrarModalDescarga}
       />
     </Box>
   );

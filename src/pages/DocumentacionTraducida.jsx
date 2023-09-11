@@ -1,15 +1,18 @@
-import { useEffect, useState } from "react"
-import InputFile from "./documentacionSolicitante/InputFile"
-import { Box, Button, Center, Flex, Grid, IconButton, ScaleFade, Text, useDisclosure } from "@chakra-ui/react"
-import { ArrowBack } from "@mui/icons-material"
-import { useNavigate } from "react-router"
-import tramiteService from "../services/TramiteService"
-import ModalError from "./ModalError"
-import ModalIsLoading from "./ModalIsLoading"
-import usuarioService from "../services/UsuarioService"
-import { useAuth0 } from "@auth0/auth0-react"
+import { useAuth0 } from "@auth0/auth0-react";
+import { useDisclosure } from "@chakra-ui/hooks";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import tramiteService from "../services/TramiteService";
+import usuarioService from "../services/UsuarioService";
+import { Box, Center, Flex, Text } from "@chakra-ui/layout";
+import { Button, IconButton } from "@chakra-ui/button";
+import { ArrowBack } from "@mui/icons-material";
+import { ScaleFade } from "@chakra-ui/transition";
+import InputFile from "../components/documentacionSolicitante/InputFile";
+import ModalError from "../components/ModalError";
+import ModalIsLoading from "../components/ModalIsLoading";
 
-const CargaDocumentos = () => {
+const DocumentacionTraducida = () => {
     const navigate = useNavigate();
     const [documentos, setDocumentos] = useState([])
     const { isOpen, onToggle } = useDisclosure();
@@ -21,7 +24,7 @@ const CargaDocumentos = () => {
     const { isOpen: isOpenError3, onOpen: onOpenError3, onClose: onCloseError3 } = useDisclosure();
     const [ certificado, setCertificados] = useState([])
     const [cantidad, setCantidad] = useState(0)
-    const {user}=useAuth0()
+    const { idUsuario } = useParams();
 
     const handleBack = () => {
         navigate(-1);
@@ -54,13 +57,7 @@ const CargaDocumentos = () => {
       
         certificadoActualizado[index] = ascendente; // Actualiza solo el descendente específico
         setCertificados(certificadoActualizado); // Actualiza la lista de certificados
-         
-        certificado.forEach((certi) => {
-            if(certi.nombre !== ""){
-                setCantidad(cantidad+1)
-            }
-        })
-        
+        setCantidad(certificadoActualizado.length)
     };
 
     const handleInputCertificado = async (e, index) => {
@@ -149,12 +146,8 @@ const CargaDocumentos = () => {
         if(documentos.length !== cantidad){
             onOpenError2()
         }else{
-            let idTraductor = JSON.parse(localStorage.getItem('idTraductor'))
-            let idSolicitante = JSON.parse(localStorage.getItem('idSolicitante'))
-            let idPedido = JSON.parse(localStorage.getItem('idPedido'))
-            await usuarioService.crearSolicitudDescarga(idSolicitante, idTraductor, certificado)
-            await usuarioService.eliminarPedidoTraduccion(idPedido)
-            await usuarioService.enviarAlerta(idTraductor, idSolicitante, "El traductor "+user.name+" ha enviado los documentos traducidos")
+            let respuesta = await tramiteService.cargarDocumentacionTraducida(certificado ,idUsuario)
+            console.log("respuesta: ", respuesta.data)
             navigate(-1)
         }
       }
@@ -283,4 +276,4 @@ const CargaDocumentos = () => {
     )
 }
 
-export default CargaDocumentos
+export default DocumentacionTraducida

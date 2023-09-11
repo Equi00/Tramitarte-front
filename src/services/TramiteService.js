@@ -41,6 +41,14 @@ class TramiteService {
     return documentacionGenerada;
   }
 
+  async cargarDocumentacionTraducida(documentacion, idUsuario) {
+    let documentacionGenerada = await axios.post(
+      `${this.urlBackend}/carga/documentacion/traducida/${idUsuario}`,
+      documentacion
+    );
+    return documentacionGenerada;
+  }
+
   async buscarPorUsuario(idUsuario) {
     let tramitePersistido = await axios.get(
       `${this.urlBackend}/tramite/usuario/${idUsuario}`
