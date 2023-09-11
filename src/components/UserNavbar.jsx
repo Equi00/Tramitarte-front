@@ -95,7 +95,7 @@ export default function UserNavbar({ usuarioLogueado }) {
       icono: <QuestionIcon color="white" bg="teal.300" boxSize={8} />,
     },
     {
-      hipervinculo: "/documentacion",
+      hipervinculo: "/documentacion-cargada",
       texto: "Certificados",
       icono: <Icon color="white" as={FolderCopy} bg="teal.300" boxSize={8} />,
     },

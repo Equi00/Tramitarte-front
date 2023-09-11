@@ -36,6 +36,7 @@ function AvoProfile() {
   useEffect(() => {
     fetchData();
   }, []); 
+  
   return (
     <Box minH="100%" h="100%" p="3%" bg="blue.800">
       <Flex minH="100%" bg="whiteAlpha.700" borderRadius="20px">

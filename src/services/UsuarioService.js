@@ -15,6 +15,10 @@ class UsuarioService {
         let usuario= await axios?.get(`${this.urlBackend}/usuario`, { params: body })
         return usuario
     }
+    async traerDocumentacionCargada(id){
+        let documentacion= await axios?.get(`${this.urlBackend}/documentacion/${id}`)
+        return documentacion.data.documentList
+    }
 
     async traerTraductores(){
         let traductores = await axios.get(`${this.urlBackend}/usuario/traductores`)
@@ -117,4 +121,3 @@ class UsuarioService {
 const usuarioService = new UsuarioService();
 
 export default usuarioService;
-//api/usuario/{id}
