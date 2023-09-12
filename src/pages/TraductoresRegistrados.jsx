@@ -53,7 +53,7 @@ function TraductoresRegistrados() {
       const solicitudes = await usuarioService.buscarSolicitudTraduccionSolicitante(idUsuario, traductorTemp.id);
       const solicitudDeSolicitante = await usuarioService.buscarSolicitudPorSolicitante(idUsuario)
       
-      if(tramite && tramite.data.etapa.descripcion === "Cargar documentación traducida"){
+      if(tramite && (tramite.data.etapa.descripcion === "Cargar documentación traducida" || tramite.data.etapa.descripcion === "Ha terminado el tramite, haga click para descargar los archivos")){
         if (solicitudes && solicitudes.length > 0) {
           onOpenError();
         } else if(solicitudDeSolicitante) {
