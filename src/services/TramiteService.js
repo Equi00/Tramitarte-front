@@ -128,6 +128,10 @@ class TramiteService {
     let avo= await axios?.get(`${this.urlBackend}/solicitud/usuario/${idUsuario}`)
     return avo.data
   }
+
+  async modificarArchivo(idArchivo,archivo){
+    await axios.post(`${this.urlBackend}/modificar/documento/${idArchivo}`, archivo)
+  }
 }
 
 const tramiteService = new TramiteService();

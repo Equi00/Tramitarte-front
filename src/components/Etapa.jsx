@@ -294,7 +294,7 @@ const abrirModalCancelar = (pedidoEnganchado) => {
               id="modal-confirmacion"
               pregunta={"¿Estás seguro de descargar los documentos?"}
               isOpen={estaAceptarAbierto}
-              handleConfirmacion={descargarArchivos} //falta logica de descarga
+              handleConfirmacion={descargarArchivos} 
               onClose={cerrarModalEnviar}
       />
     </Box>
