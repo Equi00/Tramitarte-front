@@ -63,16 +63,18 @@ function PedidosTraduccion() {
     setSolicitudes(solicitudEntrante)
   }
 
-  const enviarNotificacionAceptar = () => {
-    usuarioService.crearPedidoTraduccion(solicitudGuardada.solicitante.id, idUsuario)
-    usuarioService.enviarAlerta(idUsuario, solicitudGuardada.solicitante.id, "El traductor "+user.name+" ha aceptado su solicitud")
-    usuarioService.eliminarSolicitudTraduccion(solicitudGuardada.id)
+  const enviarNotificacionAceptar = async () => {
+    let usuario = await usuarioService.traerPorId(idUsuario)
+    await usuarioService.crearPedidoTraduccion(solicitudGuardada.solicitante.id, idUsuario)
+    await usuarioService.enviarAlerta(idUsuario, solicitudGuardada.solicitante.id, "El traductor "+usuario.nombre+" ha aceptado su solicitud")
+    await usuarioService.eliminarSolicitudTraduccion(solicitudGuardada.id)
     cerrarModalConfirmacion()
   }
 
-  const enviarNotificacionCancelar = () => {
-    usuarioService.eliminarSolicitudTraduccion(solicitudGuardada.id)
-    usuarioService.enviarAlerta(idUsuario, solicitudGuardada.solicitante.id, "El traductor "+user.name+" ha rechazado su solicitud")
+  const enviarNotificacionCancelar = async () => {
+    let usuario = await usuarioService.traerPorId(idUsuario)
+    await usuarioService.eliminarSolicitudTraduccion(solicitudGuardada.id)
+    await usuarioService.enviarAlerta(idUsuario, solicitudGuardada.solicitante.id, "El traductor "+usuario.nombre+" ha rechazado su solicitud")
     cerrarModalCancelar()
   }
 
@@ -128,7 +130,8 @@ function PedidosTraduccion() {
             </Flex>
             <Center h="100%" flexBasis="50%">
               <VStack alignItems="center" justifyContent="center">
-                <Heading textAlign="center" fontSize={15}>{solicitud.solicitante.nombre + ' ' + solicitud.solicitante.apellido}</Heading>
+                <Heading textAlign="center" fontSize={15}>{solicitud.solicitante.nombre}</Heading>
+                <Text>{"Pide sus servicios"}</Text>
               </VStack>
             </Center>
             <Flex justifyContent="flex-end" h="100%" w="20%" flexBasis="30%">

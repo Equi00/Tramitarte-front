@@ -93,7 +93,7 @@ var zip = require("jszip")()
     
       // Genera el archivo ZIP
       zip.generateAsync({ type: "blob" }).then((content) => {
-        saveAs(content, "Documentación-traducida.zip");
+        saveAs(content, "Documentación.zip");
       });
     
       cerrarModalDescargar();

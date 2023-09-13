@@ -10,6 +10,11 @@ class UsuarioService {
         return usuarioNuevo;
     }
 
+    async traerPorId(id){
+        let usuario = await axios.get(`${this.urlBackend}/usuario/${id}`)
+        return usuario.data
+    }
+
     async traerUsuarioXMail(mail) {
         let body= {"correoElectronico" : mail}
         let usuario= await axios?.get(`${this.urlBackend}/usuario`, { params: body })
@@ -104,9 +109,7 @@ class UsuarioService {
         console.log("se elimino la solicitud de descarga")
     }
     
-    async actualizarDataUsuario(body) {
-        let usuarioAux = JSON.parse(window.localStorage.getItem('usuarioLogueado'));
-        let id = usuarioAux.id;
+    async actualizarDataUsuario(id, body) {
         try {
             let usuario = await axios?.post(`${this.urlBackend}/usuario/${id}`, body);
             return usuario.data;

@@ -49,17 +49,20 @@ function TraductoresRegistrados() {
     setTraductorGuardado(traductorTemp);
     try {
       let tramite = await tramiteService.buscarPorUsuario(idUsuario)
-      
+      console.log(tramite)
       const solicitudes = await usuarioService.buscarSolicitudTraduccionSolicitante(idUsuario, traductorTemp.id);
       const solicitudDeSolicitante = await usuarioService.buscarSolicitudPorSolicitante(idUsuario)
-      
-      if(tramite && (tramite.data.etapa.descripcion === "Cargar documentación traducida" || tramite.data.etapa.descripcion === "Ha terminado el tramite, haga click para descargar los archivos")){
-        if (solicitudes && solicitudes.length > 0) {
-          onOpenError();
-        } else if(solicitudDeSolicitante) {
-          onOpenWarning(true);
+      if(tramite.data !== ""){
+        if(tramite && (tramite.data.etapa.descripcion === "Cargar documentación traducida" || tramite.data.etapa.descripcion === "Ha terminado el tramite, haga click para descargar los archivos")){
+          if (solicitudes && solicitudes.length > 0) {
+            onOpenError();
+          } else if(solicitudDeSolicitante) {
+            onOpenWarning(true);
+          }else{
+            setEstaModalAbierto(true);
+          }
         }else{
-          setEstaModalAbierto(true);
+          onOpenError2()
         }
       }else{
         onOpenError2()
@@ -91,8 +94,13 @@ function TraductoresRegistrados() {
 
   const enviarNotificacionTraductor = async () => {
     try {
-      await usuarioService.enviarNotificacion(idUsuario, traductorGuardado.id, "El usuario " + user.name + " requiere de sus servicios");
+      console.log(idUsuario)
+      console.log(traductorGuardado.id)
+      let usuario = await usuarioService.traerPorId(idUsuario)
+      console.log(usuario)
+      await usuarioService.enviarNotificacion(idUsuario, traductorGuardado.id, "El usuario " + usuario.nombre + " requiere de sus servicios");
     } catch (e) {
+      console.log(e)
       navigate("/network-error");
     }
     cerrarModal();
@@ -157,8 +165,8 @@ function TraductoresRegistrados() {
             </Center>
             <Center h="100%" flexBasis="50%">
               <VStack alignItems="center" justifyContent="center">
-                <Heading textAlign="center" fontSize={12.5}>{traductor.nombre + ' ' + traductor.apellido}</Heading>
-                <Text color="teal.400">{traductor.precio}</Text>
+                <Text textAlign="center" fontSize={12.5} fontWeight={700}>{traductor.nombre}</Text>
+                <Text fontWeight={700}>{traductor.apellido}</Text>
               </VStack>
             </Center>
             <Flex justifyContent="flex-end" h="100%" w="20%" flexBasis="30%">

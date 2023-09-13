@@ -224,7 +224,7 @@ export default function UserNavbar({ usuarioLogueado }) {
               </MenuButton>
               <MenuList color={useColorModeValue("blue.900", "white")}>
                 <MenuItem
-                  onClick={() => navigate("/usuario")}
+                  onClick={() => navigate(`/usuario/${idUsuario}`)}
                   icon={<AccountCircle />}
                 >
                   Mi perfil

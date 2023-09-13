@@ -57,7 +57,7 @@ const DocumentacionTraducida = () => {
       
         certificadoActualizado[index] = ascendente; // Actualiza solo el descendente específico
         setCertificados(certificadoActualizado); // Actualiza la lista de certificados
-        setCantidad(certificadoActualizado.length)
+        setCantidad(cantidad+1)
     };
 
     const handleInputCertificado = async (e, index) => {
@@ -168,7 +168,7 @@ const DocumentacionTraducida = () => {
       }
 
       const traerTramite = async () =>{
-        let tramite = await tramiteService.buscarPorUsuario(JSON.parse(localStorage.getItem('idSolicitante')))
+        let tramite = await tramiteService.buscarPorUsuario(idUsuario)
         let data = tramite.data
         let documentos = data.adjuntosATraducir
         let nombres = documentos.map((docu) => docu.tipo)

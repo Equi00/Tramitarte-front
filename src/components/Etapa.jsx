@@ -185,7 +185,7 @@ const abrirModalCancelar = (pedidoEnganchado) => {
   
     // Genera el archivo ZIP
     zip.generateAsync({ type: "blob" }).then((content) => {
-      saveAs(content, "Documentación-traducida.zip");
+      saveAs(content, "Documentación-tramite.zip");
     });
     cerrarModalDescarga();
     setEstaCargando(false)

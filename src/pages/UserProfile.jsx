@@ -14,15 +14,16 @@ import {
 } from "@chakra-ui/react";
 import { AccountCircle, Close, Edit } from "@mui/icons-material";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import usuarioService from "../services/UsuarioService";
 
 function UserProfile() {
   const [edit,setEdit]= useState(false)
-  const [editNickname,setEditNickname]= useState()
-  const [editNombre, setEditNombre]=useState()
-  const [editApellido, setEditApellido]=useState()
+  const [editNickname,setEditNickname]= useState("")
+  const [editNombre, setEditNombre]=useState("")
+  const [editApellido, setEditApellido]=useState("")
   const [userData, setUserData] = useState()
+  const { idUsuario } = useParams();
   
   const {user}=useAuth0()
   const navigate = useNavigate();
@@ -39,7 +40,16 @@ function UserProfile() {
         "apellido":editApellido,
         "nombre":editNombre
       }
-      let usuarioActualizado = await usuarioService.actualizarDataUsuario(body)
+      if(body.username === ""){
+        body.username = userData.username
+      }
+      if(body.apellido === ""){
+        body.apellido = userData.apellido
+      }
+      if(body.nombre === ""){
+        body.nombre = userData.nombre
+      }
+      let usuarioActualizado = await usuarioService.actualizarDataUsuario(idUsuario,body)
       setEditNickname(usuarioActualizado.username);
       setEditNombre(usuarioActualizado.nombre);
       setEditApellido(usuarioActualizado.apellido)
@@ -48,15 +58,18 @@ function UserProfile() {
 };
 
   const handleCancel = () => {
-    setEditNickname(user ? user.name : JSON.parse(window.localStorage.getItem('usuarioLogueado').username));
+    setEditNickname(user ? user.name : editNickname);
     setEdit(false);
   };
  
   const fetchDataUser = async () => {
     try{ 
-      console.log(JSON.parse(window.localStorage.getItem('usuarioLogueado')).correoElectronico)
-         const datosUsuario=await usuarioService.traerUsuarioXMail(JSON.parse(window.localStorage.getItem('usuarioLogueado')).correoElectronico);
-        setUserData(datosUsuario)
+         let datosUsuario=await usuarioService.traerPorId(idUsuario);
+         console.log(datosUsuario)
+          setUserData(datosUsuario)
+          setEditApellido(datosUsuario.apellido)
+          setEditNickname(datosUsuario.username)
+          setEditNombre(datosUsuario.nombre)
   } catch (error) {
       console.error('Error al obtener datos del Usuario:', error);
     }
@@ -116,7 +129,7 @@ useEffect(() => {
             </Center>
           </Flex>
           <Wrap py="5%" color="blue.900" justifyContent="center">
-            <WrapItem p="2.4rem" w="sm">
+            <WrapItem p="2.4rem" w="sm" display={"grid"}>
               <Box justifyContent="center" marginRight="2.4rem">
                 <AccountCircle size="lg" />
               </Box>

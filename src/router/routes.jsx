@@ -80,6 +80,8 @@ export const RouterApp = ({ setTramiteContext, setUsuarioLogueadoContext }) => {
           element={<TraductoresRegistrados />} 
         />
 
+        <Route path="/usuario/:idUsuario" element={<UserProfile />} />
+
         <Route 
           path="home/traductor/:idUsuario/pedidos-pendientes" 
           element={<PedidosTraduccion />} 

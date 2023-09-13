@@ -36,10 +36,15 @@ function DocumentacionCargada() {
   const [estaCargando, setEstaCargando] = useState(false);
   const { isOpen: isOpenError, onOpen: onOpenError, onClose: onCloseError } = useDisclosure();
   const { isOpen: isOpenError2, onOpen: onOpenError2, onClose: onCloseError2 } = useDisclosure();
+  const { isOpen: isOpenError3, onOpen: onOpenError3, onClose: onCloseError3 } = useDisclosure();
   const [estaAceptarAbierto, setEstaAceptarAbierto] = useState(false);
   
   const abrirModalEnviar = () => {
-    setEstaAceptarAbierto(true);
+    if(documentosCargados.length > 0){
+      setEstaAceptarAbierto(true);
+    }else{
+      onOpenError3()
+    }
   };
 
   const cerrarModalEnviar = () => {
@@ -149,7 +154,14 @@ function DocumentacionCargada() {
   
     // Itera sobre los archivos en formato Base64 y agrégalos al ZIP
     arrayArchivos.forEach((archivo, index) => { // Agrega un índice
-      const nombreArchivo = `${archivo.nombre.replace(/\s/g, '_')}_${index}.pdf`; // Añade el índice al nombre
+      let ultimoPunto = archivo.nombre.lastIndexOf(".");
+      let extension = archivo.nombre.slice(ultimoPunto + 1);
+      let nombreArchivo = ""
+      if(extension === "jpg"){
+        nombreArchivo = `${archivo.nombre.replace(/\s/g, '_')}_${index}.jpg`; // Añade el índice al nombre
+      }else{
+        nombreArchivo = `${archivo.nombre.replace(/\s/g, '_')}_${index}.pdf`; // Añade el índice al nombre
+      }
       const base64Data = archivo.archivoBase64;
   
       // Decodifica el Base64 en un Blob
@@ -161,7 +173,7 @@ function DocumentacionCargada() {
   
     // Genera el archivo ZIP
     zip.generateAsync({ type: "blob" }).then((content) => {
-      saveAs(content, "Documentación-traducida.zip");
+      saveAs(content, "Documentación-tramite.zip");
     });
     cerrarModalEnviar();
   };
@@ -267,6 +279,14 @@ function DocumentacionCargada() {
                 }
                 isOpen={isOpenError2}
                 onClose={onCloseError2}
+            />
+      <ModalError
+                pregunta={"No hay archivos cargados"}
+                datoAConfirmar={
+                "Por favor ingrese archivos en la aplicacion para poder descargar."
+                }
+                isOpen={isOpenError3}
+                onClose={onCloseError3}
             />
       <ModalIsLoading
                 mensaje={"Esperanos mientras guardamos la documentación ;)"}
