@@ -58,7 +58,6 @@ function UserProfile() {
 };
 
   const handleCancel = () => {
-    setEditNickname(user ? user.name : editNickname);
     setEdit(false);
   };
  
